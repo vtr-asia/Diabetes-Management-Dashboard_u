@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>糖尿病共照網品質儀表板</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .transition-all { transition: all 0.4s ease-in-out; }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans transition-all" id="body-bg">
+
+    <nav class="bg-slate-900 text-white p-4 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-hospital-user text-2xl text-blue-400"></i>
+                <span class="text-xl font-bold tracking-tight">Diabetes Management Dashboard</span>
+            </div>
+            
+            <div class="flex items-center bg-slate-800 p-1 rounded-lg border border-slate-700">
+                <button onclick="switchPatient('zhao')" id="btn-zhao" class="px-4 py-1 rounded-md text-sm font-bold transition-all bg-red-600 text-white">趙鐵柱 (高風險)</button>
+                <button onclick="switchPatient('li')" id="btn-li" class="px-4 py-1 rounded-md text-sm font-bold transition-all text-slate-400 hover:text-white">李明德 (穩定)</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto py-8 px-4">
+        
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-8 border border-slate-200 flex flex-wrap justify-between items-center transition-all" id="patient-card">
+            <div class="flex items-center space-x-6">
+                <div id="avatar-box" class="w-20 h-20 rounded-full flex items-center justify-center text-white text-3xl shadow-inner transition-all bg-red-500">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold text-slate-800" id="ui-name">趙鐵柱</h1>
+                    <p class="text-slate-500">FHIR ID: <span id="ui-id" class="font-mono">695257</span> | 男 | <span id="ui-age">56</span> 歲</p>
+                    <div class="mt-2 flex space-x-2" id="ui-tags">
+                        <span class="px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded">高風險管理</span>
+                    </div>
+                </div>
+            </div>
+            <div id="action-buttons" class="mt-4 lg:mt-0">
+                <button onclick="handleAction()" id="main-action-btn" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:shadow-lg transition-all font-bold">
+                    <i class="fa-solid fa-file-medical mr-2"></i>補開檢查單
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-t-4 transition-all border-red-500" id="card-hba1c">
+                        <span class="text-slate-400 font-bold uppercase text-xs tracking-wider">HbA1c (糖化血色素)</span>
+                        <div class="mt-4 flex items-baseline">
+                            <span class="text-5xl font-black text-slate-800" id="ui-hba1c">8.8</span>
+                            <span class="text-xl text-slate-400 ml-1">%</span>
+                        </div>
+                        <p class="mt-2 text-sm font-bold transition-all text-red-600" id="ui-hba1c-msg">● 遠高於目標值 (7.0%)</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-t-4 transition-all border-orange-500" id="card-eye">
+                        <span class="text-slate-400 font-bold uppercase text-xs tracking-wider">眼底檢查狀態 (Procedure)</span>
+                        <div class="mt-4">
+                            <span class="text-2xl font-bold text-slate-800" id="ui-eye-status">逾期未檢</span>
+                            <p class="text-slate-400 text-sm" id="ui-eye-date">上次: 2024-05-10</p>
+                        </div>
+                        <div id="ui-eye-alert" class="mt-4 bg-orange-50 text-orange-700 p-2 rounded text-xs">
+                            ⚠️ 已過期 20 個月
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                    <h3 class="text-slate-800 font-bold mb-4">HbA1c 歷史趨勢</h3>
+                    <canvas id="trendChart" height="100"></canvas>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div id="cds-box" class="p-6 rounded-xl shadow-lg transition-all bg-slate-800 text-white">
+                    <h3 class="text-blue-400 font-bold text-xs mb-4 tracking-widest uppercase font-mono tracking-tighter">Clinical Decision Support</h3>
+                    <div id="ui-suggestions" class="space-y-4 text-sm">
+                        </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    
+
+    <script>
+        const patients = {
+            zhao: {
+                name: "趙鐵柱", id: "695257", age: "56", hba1c: 8.8,
+                lastEye: "2024-05-10", eyeStatus: "逾期未檢", eyeOverdue: true,
+                tags: ["高風險管理"], color: "red",
+                trend: [7.5, 7.8, 8.4, 8.8],
+                suggestions: ["檢測到眼底篩檢缺口", "建議調整用藥 (加入 SGLT2i)"]
+            },
+            li: {
+                name: "李明德", id: "695268", age: "51", hba1c: 6.4,
+                lastEye: "2025-08-20", eyeStatus: "效期內", eyeOverdue: false,
+                tags: ["穩定追蹤個案", "品質優良"], color: "green",
+                trend: [6.8, 6.7, 6.5, 6.4],
+                suggestions: ["目前控制良好", "維持年度篩檢計畫"]
+            }
+        };
+
+        let currentChart = null;
+
+        function switchPatient(key) {
+            const p = patients[key];
+            
+            // 更新 UI 文本
+            document.getElementById('ui-name').innerText = p.name;
+            document.getElementById('ui-id').innerText = p.id;
+            document.getElementById('ui-age').innerText = p.age;
+            document.getElementById('ui-hba1c').innerText = p.hba1c;
+            document.getElementById('ui-eye-status').innerText = p.eyeStatus;
+            document.getElementById('ui-eye-date').innerText = "上次: " + p.lastEye;
+            
+            // 更新顏色與風格
+            const avatar = document.getElementById('avatar-box');
+            const hba1cCard = document.getElementById('card-hba1c');
+            const hba1cMsg = document.getElementById('ui-hba1c-msg');
+            const eyeCard = document.getElementById('card-eye');
+            const eyeAlert = document.getElementById('ui-eye-alert');
+            const actionBtn = document.getElementById('main-action-btn');
+            
+            if (p.color === 'red') {
+                avatar.className = "w-20 h-20 rounded-full flex items-center justify-center text-white text-3xl shadow-inner transition-all bg-red-500";
+                hba1cCard.className = "bg-white p-6 rounded-xl shadow-sm border-t-4 transition-all border-red-500";
+                hba1cMsg.className = "mt-2 text-sm font-bold text-red-600";
+                hba1cMsg.innerText = "● 遠高於目標值 (7.0%)";
+                eyeCard.className = "bg-white p-6 rounded-xl shadow-sm border-t-4 transition-all border-orange-500";
+                eyeAlert.style.display = "block";
+                actionBtn.className = "bg-red-600 text-white px-6 py-2 rounded-lg hover:shadow-lg transition-all font-bold";
+                actionBtn.innerHTML = '<i class="fa-solid fa-file-medical mr-2"></i>補開檢查單';
+                document.getElementById('btn-zhao').className = "px-4 py-1 rounded-md text-sm font-bold bg-red-600 text-white";
+                document.getElementById('btn-li').className = "px-4 py-1 rounded-md text-sm font-bold text-slate-400";
+            } else {
+                avatar.className = "w-20 h-20 rounded-full flex items-center justify-center text-white text-3xl shadow-inner transition-all bg-green-500";
+                hba1cCard.className = "bg-white p-6 rounded-xl shadow-sm border-t-4 transition-all border-green-500";
+                hba1cMsg.className = "mt-2 text-sm font-bold text-green-600";
+                hba1cMsg.innerText = "● 控制達成目標";
+                eyeCard.className = "bg-white p-6 rounded-xl shadow-sm border-t-4 transition-all border-green-500";
+                eyeAlert.style.display = "none";
+                actionBtn.className = "bg-green-600 text-white px-6 py-2 rounded-lg hover:shadow-lg transition-all font-bold";
+                actionBtn.innerHTML = '<i class="fa-solid fa-check-circle mr-2"></i>列印定期追蹤表';
+                document.getElementById('btn-li').className = "px-4 py-1 rounded-md text-sm font-bold bg-green-600 text-white";
+                document.getElementById('btn-zhao').className = "px-4 py-1 rounded-md text-sm font-bold text-slate-400";
+            }
+
+            // 更新建議區
+            const sugBox = document.getElementById('ui-suggestions');
+            sugBox.innerHTML = p.suggestions.map(s => `<div class="flex items-start space-x-3"><i class="fa-solid fa-circle-info text-blue-400 mt-1"></i><p>${s}</p></div>`).join('');
+
+            updateChart(p.trend, p.color === 'red' ? '#ef4444' : '#22c55e');
+        }
+
+        function updateChart(data, color) {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            if (currentChart) currentChart.destroy();
+            currentChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+                    datasets: [{
+                        label: 'HbA1c %',
+                        data: data,
+                        borderColor: color,
+                        backgroundColor: color + '22',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } } }
+            });
+        }
+
+        function handleAction() {
+            alert("已成功向沙盒發送 ServiceRequest / Report 操作！");
+        }
+
+        // 初始化
+        switchPatient('zhao');
+    </script>
+</body>
+</html>
