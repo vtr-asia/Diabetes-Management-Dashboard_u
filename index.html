@@ -3,226 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>糖尿病共照網 - 品質管理儀表板</title>
+    <title>糖尿病共照網品質儀表板</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/fhirclient/build/fhir-client.js"></script>
     <style>
-        /* --- 基礎樣式重設 --- */
-        :root {
-            --primary-color: #3498db;
-            --success-color: #2ecc71;
-            --warning-color: #f1c40f;
-            --danger-color: #e74c3c;
-            --bg-color: #f4f7f6;
-            --text-color: #2c3e50;
-            --card-bg: #ffffff;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: "Helvetica Neue", Helvetica, "PingFang TC", "Microsoft JhengHei", sans-serif; background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; }
-
-        /* --- 主佈局 --- */
-        .wrapper { display: flex; flex-direction: column; height: 100vh; }
-        
-        /* 頂部導覽列 */
-        header { background-color: var(--card-bg); padding: 15px 30px; box-shadow: var(--shadow); display: flex; justify-content: space-between; align-items: center; z-index: 10; }
-        .brand { font-size: 1.5rem; font-weight: bold; color: var(--primary-color); display: flex; align-items: center; gap: 10px; }
-        .user-info { display: flex; align-items: center; gap: 15px; }
-        .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; background-color: #eee; }
-        .status-verified { background-color: rgba(46, 204, 113, 0.1); color: var(--success-color); border: 1px solid var(--success-color); }
-
-        /* 主要內容區 */
-        main { flex: 1; padding: 30px; overflow-y: auto; }
-        .container { max-width: 1200px; margin: 0 auto; }
-
-        /* --- 儀表板元件 --- */
-        .page-header { margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
-        .page-title { font-size: 1.8rem; font-weight: 700; color: var(--text-color); }
-        .patient-card { background-color: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: var(--shadow); display: flex; align-items: center; gap: 20px; margin-bottom: 30px; border-left: 5px solid var(--primary-color); }
-        .patient-avatar { width: 60px; height: 60px; background-color: #e1f5fe; color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
-        .patient-details h2 { font-size: 1.4rem; margin-bottom: 5px; }
-        .patient-details p { color: #7f8c8d; font-size: 0.9rem; }
-
-        /* 數據卡片格線 */
-        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        
-        /* 獨立數據卡片 */
-        .metric-card { background-color: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: var(--shadow); transition: transform 0.2s; position: relative; overflow: hidden; }
-        .metric-card:hover { transform: translateY(-3px); }
-        .metric-title { font-size: 1rem; color: #7f8c8d; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-        .metric-value { font-size: 2.5rem; font-weight: bold; color: var(--text-color); }
-        .metric-unit { font-size: 1rem; color: #7f8c8d; font-weight: normal; margin-left: 5px; }
-        .metric-status { position: absolute; top: 0; right: 0; width: 6px; height: 100%; }
-
-        /* 指標顏色狀態 */
-        .status-good { color: var(--success-color) !important; }
-        .status-good-bg { background-color: var(--success-color); }
-        .status-warn { color: var(--warning-color) !important; }
-        .status-warn-bg { background-color: var(--warning-color); }
-        .status-bad { color: var(--danger-color) !important; }
-        .status-bad-bg { background-color: var(--danger-color); }
-
-        /* 進度條 (用於顯示檢驗率) */
-        .progress-container { margin-top: 15px; background-color: #ecf0f1; border-radius: 10px; height: 10px; overflow: hidden; }
-        .progress-bar { height: 100%; background-color: var(--primary-color); border-radius: 10px; width: 0%; transition: width 0.5s ease-in-out; }
-
-        /* 載入中遮罩 */
-        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
-        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary-color); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 15px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
+        .transition-all { transition: all 0.4s ease-in-out; }
     </style>
 </head>
-<body>
+<body class="bg-slate-50 font-sans transition-all" id="body-bg">
 
-<div id="loading-overlay">
-    <div class="spinner"></div>
-    <p>正在通過 OAuth 驗證，並讀取共照網數據...</p>
-</div>
-
-<div class="wrapper">
-    <header>
-        <div class="brand">
-            <i class="fas fa-heartbeat"></i>
-            <span>糖尿病共照網</span>
-        </div>
-        <div class="user-info">
-            <span id="auth-status" class="status-badge">驗證中...</span>
-            <i class="fas fa-user-circle fa-lg"></i>
-        </div>
-    </header>
-
-    <main>
-        <div class="container">
-            <div class="page-header">
-                <h1 class="page-title">品質管理儀表板</h1>
-                <p style="color: #7f8c8d;">數據時間：<span id="data-date">--</span></p>
+    <nav class="bg-slate-900 text-white p-4 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-hospital-user text-2xl text-blue-400"></i>
+                <span class="text-xl font-bold tracking-tight">Diabetes Management Dashboard</span>
             </div>
-
-            <div class="patient-card">
-                <div class="patient-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
-                <div class="patient-details">
-                    <h2>讀取中...</h2>
-                    <p id="patient-id-display">FHIR ID: --</p>
-                </div>
-            </div>
-
-            <div class="metrics-grid">
-                
-                <div class="metric-card">
-                    <div class="metric-status status-good-bg"></div>
-                    <div class="metric-title">
-                        <i class="fas fa-vial"></i> 糖化血色素 (HbA1c) 檢驗率
-                    </div>
-                    <div>
-                        <span id="hba1c-val" class="metric-value status-good">--</span>
-                        <span class="metric-unit">%</span>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-bar status-good-bg" style="width: 92%"></div>
-                    </div>
-                </div>
-
-                <div class="metric-card">
-                    <div class="metric-status status-warn-bg"></div>
-                    <div class="metric-title">
-                        <i class="fas fa-eye"></i> 眼底檢查或眼底攝影率
-                    </div>
-                    <div>
-                        <span id="eye-val" class="metric-value status-warn">--</span>
-                        <span class="metric-unit">%</span>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-bar status-warn-bg" style="width: 85%"></div>
-                    </div>
-                </div>
-
-                <div class="metric-card">
-                    <div class="metric-status status-bad-bg"></div>
-                    <div class="metric-title">
-                        <i class="fas fa-prescription-bottle"></i> 尿液微量白蛋白檢查率 (ACR)
-                    </div>
-                    <div>
-                        <span id="acr-val" class="metric-value status-bad">--</span>
-                        <span class="metric-unit">%</span>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-bar status-bad-bg" style="width: 68%"></div>
-                    </div>
-                </div>
-
-            </div> </div>
-    </main>
-</div>
-
-<script>
-    // 設置今天日期
-    document.getElementById('data-date').innerText = new Date().toLocaleDateString('zh-TW');
-
-    // 執行 FHIR 認證回傳處理
-    FHIR.oauth2.ready()
-        .then(client => {
-            console.log("SMART Client Ready:", client);
-
-            // 更新 UI 狀態
-            document.getElementById('loading-overlay').style.display = 'none';
-            const authStatus = document.getElementById('auth-status');
-            authStatus.innerText = 'OAuth 驗證成功';
-            authStatus.classList.add('status-verified');
-
-            // 1. 取得病患基本資料 (實際 FHIR API 呼叫)
-            client.patient.read().then(patient => {
-                let name = "未知病患";
-                if (patient.name && patient.name.length > 0) {
-                    name = patient.name[0].text || (patient.name[0].family + " " + patient.name[0].given.join(" "));
-                }
-                document.querySelector('.patient-details h2').innerText = name;
-                document.getElementById('patient-id-display').innerText = `FHIR ID: ${patient.id}`;
-            }).catch(e => {
-                document.querySelector('.patient-details h2').innerText = "無法讀取病患";
-            });
-
-            // 2. 這裡模擬從共照網 API 取得的品質數據
-            // 在實際環境中，您可能需要呼叫 client.request 或 client.search 
-            // 來讀取此病患的 Observation 或 MeasureReport。
             
-            setTimeout(() => {
-                // 模擬數據填充與 UI 更新
-                animateValue('hba1c-val', 0, 92, 1000);
-                animateValue('eye-val', 0, 85, 1000);
-                animateValue('acr-val', 0, 68, 1000);
-            }, 500);
+            <div class="flex items-center bg-slate-800 p-1 rounded-lg border border-slate-700">
+                <button onclick="switchPatient('zhao')" id="btn-zhao" class="px-4 py-1 rounded-md text-sm font-bold transition-all bg-red-600 text-white">趙鐵柱 (高風險)</button>
+                <button onclick="switchPatient('li')" id="btn-li" class="px-4 py-1 rounded-md text-sm font-bold transition-all text-slate-400 hover:text-white">李明德 (穩定)</button>
+            </div>
+        </div>
+    </nav>
 
-        })
-        .catch(error => {
-            console.error("Auth Error:", error);
-            document.getElementById('loading-overlay').innerHTML = `
-                <i class="fas fa-exclamation-triangle fa-3x" style="color:var(--danger-color); margin-bottom:15px;"></i>
-                <h3 style="color:var(--danger-color);">OAuth 驗證失敗</h3>
-                <p>${error.message}</p>
-            `;
-        });
+    <main class="container mx-auto py-8 px-4">
+        
+        <!-- 病人基本資訊卡 -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-8 border border-slate-200 flex flex-wrap justify-between items-center transition-all" id="patient-card">
+            <div class="flex items-center space-x-6">
+                <div id="avatar-box" class="w-20 h-20 rounded-full flex items-center justify-center text-white text-3xl shadow-inner transition-all bg-red-500">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold text-slate-800" id="ui-name">趙鐵柱</h1>
+                    <p class="text-slate-500">FHIR ID: <span id="ui-id" class="font-mono">695257</span> | 男 | <span id="ui-age">56</span> 歲</p>
+                    <div class="mt-2 flex space-x-2" id="ui-tags">
+                        <span class="px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded">高風險管理</span>
+                    </div>
+                </div>
+            </div>
+            <div id="action-buttons" class="mt-4 lg:mt-0">
+                <button onclick="handleAction()" id="main-action-btn" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:shadow-lg transition-all font-bold">
+                    <i class="fa-solid fa-file-medical mr-2"></i>補開檢查單
+                </button>
+            </div>
+        </div>
 
-    // 數據數字跑馬燈動畫效果
-    function animateValue(id, start, end, duration) {
-        if (start === end) return;
-        const range = end - start;
-        let current = start;
-        const increment = end > start? 1 : -1;
-        const stepTime = Math.abs(Math.floor(duration / range));
-        const obj = document.getElementById(id);
-        const timer = setInterval(function() {
-            current += increment;
-            obj.innerHTML = current;
-            if (current == end) {
-                clearInterval(timer);
-            }
-        }, stepTime);
-    }
-</script>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- 左側主要區域 -->
+            <div class="lg:col-span-2 space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- HbA1c 卡片 -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-t-4 transition-all border-red-500" id="card-hba1c">
+                        <span class="text-slate-400 font-bold uppercase text-xs tracking-wider">HbA1c (糖化血色素)</span>
+                        <div class="mt-4 flex items-baseline">
+                            <span class="text-5xl font-black text-slate-800" id="ui-hba1c">8.8</span>
+                            <span class="text-xl text-slate-400 ml-1">%</span>
+                        </div>
+                        <p class="mt-2 text-sm font-bold transition-all text-red-600" id="ui-hba1c-msg">● 遠高於目標值 (7.0%)</p>
+                    </div>
 
-</body>
-</html>
+                    <!-- 眼底檢查卡片 -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-t-4 transition-all border-orange-500" id="card-eye">
+                        <span class="text-slate-400 font-bold uppercase text-xs tracking-wider">眼底檢查狀態 (Procedure)</span>
+                        <div class="mt-4">
+                            <span class="text-2xl font-bold text-slate-800" id="ui-eye-status">逾期未檢</span>
+                            <p class="text-slate-400 text-sm" id="ui-eye-date">上次: 2024-05-10</p>
+                        </div>
+                        <div id="ui-eye-alert" class="mt-4 bg-orange-50 text-orange-700 p-2 rounded text-xs">
+                            ⚠️ 已過期 20 個月
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HbA1c 趨勢圖 -->
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                    <h3 class="text-slate-800 font-bold mb-4">HbA1c 歷史趨勢</h3>
+                    <canvas id="trendChart" height="100"></canvas>
+                </div>
+            </div>
+
+            <!-- 右側側邊欄 -->
+            <div class="space-y-6">
+                
+                <!-- Clinical Decision Support -->
+                <div id="cds-box" class="p-6 rounded-xl shadow-lg transition-all bg-slate-800 text-white">
+                    <h3 class="text-blue-400 font-bold text-xs mb-4 tracking-widest uppercase font-mono tracking-tighter">Clinical Decision Support</h3>
+                    <div id="ui-suggestions" class="space-y-4 text-sm"></div>
+                </div>
+
+                <!-- 新增：糖尿病衛教專區 -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 transition-all">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-slate-800 font-bold flex items-center">
+                            <i class="fa-solid fa-book-open text-emerald-500 mr-2"></i>
+                            糖尿病衛教專區
+                        </h3>
+                        <span class="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full font-medium">最新推薦</span>
+                    </div>
+                    
+                    <div id="education-content" class="space-y-5 text-sm">
+                        <!-- 衛教內容將由 JavaScript 動態產生 -->
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-slate-100">
+                        <button onclick="openEducationModal()" 
+                                class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            查看完整衛教資源庫
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 簡單衛教彈出視窗（可後續擴充） -->
+    <div id="education-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl max-w-lg w-full mx-4 max-h-[90vh] overflow-hidden">
+            <div class="p-6 border-b flex justify-between items-center">
+                <h2 class="text-xl font-bold">糖尿病衛教資源庫</h2>
+                <button onclick="closeEducationModal()" class="text-slate-400 hover:text-slate-600 text-2xl leading-none">×</button>
+            </div>
+            <div class="p-6 overflow-y-auto max-h-[70vh] space-y-4 text-sm">
+                <p class="text-slate-600">目前衛教資料庫正在建置中，完整內容將包含：</p>
+                <ul class="list-disc pl-5 space-y-2 text-slate-700">
+                    <li>飲食控制原則（低GI食物選擇）</li>
+                    <li>運動處方（有氧 + 阻力訓練）</li>
+                    <li>低血糖緊急處理流程</li>
+                    <li>足部護理與預防併發症</li>
+                    <li>藥物正確使用須知</li>
+                    <li>血糖自我監測技巧</li>
+                </ul>
+                <p class="text-emerald-600 font-medium mt-6">建議由衛教師或醫師根據病人目前 HbA1c 與生活型態提供個人化衛教。</p>
+            </div>
+            <div class="p-4 border-t flex justify-end">
+                <button onclick="closeEducationModal()" 
+                        class="px-6 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg font-medium">關閉</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const patients = {
+            zhao: {
+                name: "趙鐵柱", id: "695257", age: "56", hba1c: 8.8,
+                lastEye: "2024-05-10", eyeStatus: "逾期未檢", eyeOverdue: true,
+                tags: ["高風險管理"], color: "red",
+                trend: [7.5, 7.8, 8.4, 8.8],
+                suggestions: ["檢測到眼底篩檢缺口", "建議調整用藥 (加入 SGLT2i)"],
+                education: [
+                    { title: "高血糖控制重點", icon: "fa-solid fa-chart-line", color: "red", desc: "目前 HbA1c 偏高，建議每日監測血糖並調整飲食結構。" },
+                    { title: "飲食建議", icon: "fa-solid fa-apple-whole", color: "emerald", desc: "減少精製碳水化合物，增加蔬菜與優質蛋白質。" }
+                ]
+            },
+            li: {
+                name: "李明德", id: "695268", age: "51", hba1c: 6.4,
+                lastEye: "202
