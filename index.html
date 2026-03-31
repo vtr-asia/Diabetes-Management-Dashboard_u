@@ -20,13 +20,26 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: "Helvetica Neue", Helvetica, "PingFang TC", "Microsoft JhengHei", sans-serif; background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; }
+        body { 
+            font-family: "Helvetica Neue", Helvetica, "PingFang TC", "Microsoft JhengHei", sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            line-height: 1.6; 
+        }
 
         /* --- 主佈局 --- */
         .wrapper { display: flex; flex-direction: column; height: 100vh; }
         
         /* 頂部導覽列 */
-        header { background-color: var(--card-bg); padding: 15px 30px; box-shadow: var(--shadow); display: flex; justify-content: space-between; align-items: center; z-index: 10; }
+        header { 
+            background-color: var(--card-bg); 
+            padding: 15px 30px; 
+            box-shadow: var(--shadow); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            z-index: 10; 
+        }
         .brand { font-size: 1.5rem; font-weight: bold; color: var(--primary-color); display: flex; align-items: center; gap: 10px; }
         .user-info { display: flex; align-items: center; gap: 15px; }
         .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; background-color: #eee; }
@@ -39,18 +52,58 @@
         /* --- 儀表板元件 --- */
         .page-header { margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
         .page-title { font-size: 1.8rem; font-weight: 700; color: var(--text-color); }
-        .patient-card { background-color: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: var(--shadow); display: flex; align-items: center; gap: 20px; margin-bottom: 30px; border-left: 5px solid var(--primary-color); }
-        .patient-avatar { width: 60px; height: 60px; background-color: #e1f5fe; color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+
+        .patient-card { 
+            background-color: var(--card-bg); 
+            padding: 20px; 
+            border-radius: 12px; 
+            box-shadow: var(--shadow); 
+            display: flex; 
+            align-items: center; 
+            gap: 20px; 
+            margin-bottom: 30px; 
+            border-left: 5px solid var(--primary-color); 
+        }
+        .patient-avatar { 
+            width: 60px; height: 60px; 
+            background-color: #e1f5fe; 
+            color: var(--primary-color); 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 1.5rem; 
+        }
         .patient-details h2 { font-size: 1.4rem; margin-bottom: 5px; }
         .patient-details p { color: #7f8c8d; font-size: 0.9rem; }
 
         /* 數據卡片格線 */
-        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .metrics-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 20px; 
+            margin-bottom: 40px;
+        }
         
         /* 獨立數據卡片 */
-        .metric-card { background-color: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: var(--shadow); transition: transform 0.2s; position: relative; overflow: hidden; }
+        .metric-card { 
+            background-color: var(--card-bg); 
+            padding: 25px; 
+            border-radius: 12px; 
+            box-shadow: var(--shadow); 
+            transition: transform 0.2s; 
+            position: relative; 
+            overflow: hidden; 
+        }
         .metric-card:hover { transform: translateY(-3px); }
-        .metric-title { font-size: 1rem; color: #7f8c8d; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .metric-title { 
+            font-size: 1rem; 
+            color: #7f8c8d; 
+            margin-bottom: 10px; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+        }
         .metric-value { font-size: 2.5rem; font-weight: bold; color: var(--text-color); }
         .metric-unit { font-size: 1rem; color: #7f8c8d; font-weight: normal; margin-left: 5px; }
         .metric-status { position: absolute; top: 0; right: 0; width: 6px; height: 100%; }
@@ -63,15 +116,108 @@
         .status-bad { color: var(--danger-color) !important; }
         .status-bad-bg { background-color: var(--danger-color); }
 
-        /* 進度條 (用於顯示檢驗率) */
-        .progress-container { margin-top: 15px; background-color: #ecf0f1; border-radius: 10px; height: 10px; overflow: hidden; }
-        .progress-bar { height: 100%; background-color: var(--primary-color); border-radius: 10px; width: 0%; transition: width 0.5s ease-in-out; }
+        /* 進度條 */
+        .progress-container { 
+            margin-top: 15px; 
+            background-color: #ecf0f1; 
+            border-radius: 10px; 
+            height: 10px; 
+            overflow: hidden; 
+        }
+        .progress-bar { 
+            height: 100%; 
+            background-color: var(--primary-color); 
+            border-radius: 10px; 
+            width: 0%; 
+            transition: width 0.5s ease-in-out; 
+        }
+
+        /* ==================== 新增：衛教區 ==================== */
+        .education-section {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .education-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+        .edu-card {
+            background-color: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 18px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .edu-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+            border-color: var(--primary-color);
+        }
+        .edu-card h4 {
+            margin-bottom: 8px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .edu-card p {
+            font-size: 0.95rem;
+            color: #555;
+            line-height: 1.5;
+        }
+        .edu-btn {
+            margin-top: 12px;
+            padding: 8px 16px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+        .edu-btn:hover {
+            background-color: #2980b9;
+        }
 
         /* 載入中遮罩 */
-        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
-        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary-color); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 15px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
+        #loading-overlay { 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            background: rgba(255,255,255,0.9); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 1000; 
+        }
+        .spinner { 
+            border: 4px solid #f3f3f3; 
+            border-top: 4px solid var(--primary-color); 
+            border-radius: 50%; 
+            width: 40px; height: 40px; 
+            animation: spin 1s linear infinite; 
+            margin-bottom: 15px; 
+        }
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
     </style>
 </head>
 <body>
@@ -100,6 +246,7 @@
                 <p style="color: #7f8c8d;">數據時間：<span id="data-date">--</span></p>
             </div>
 
+            <!-- 病患資訊卡 -->
             <div class="patient-card">
                 <div class="patient-avatar">
                     <i class="fas fa-user"></i>
@@ -110,8 +257,8 @@
                 </div>
             </div>
 
+            <!-- 品質指標卡片 -->
             <div class="metrics-grid">
-                
                 <div class="metric-card">
                     <div class="metric-status status-good-bg"></div>
                     <div class="metric-title">
@@ -153,27 +300,67 @@
                         <div class="progress-bar status-bad-bg" style="width: 68%"></div>
                     </div>
                 </div>
+            </div>
 
-            </div> </div>
+            <!-- 新增：衛教區 -->
+            <div class="education-section">
+                <div class="section-title">
+                    <i class="fas fa-book-medical"></i>
+                    <span>糖尿病衛教專區</span>
+                </div>
+                <div class="education-grid">
+                    <div class="edu-card" onclick="showEduModal(1)">
+                        <h4><i class="fas fa-apple-alt"></i> 飲食控制</h4>
+                        <p>學習如何計算碳水化合物、選擇低升糖指數食物，穩定血糖。</p>
+                        <button class="edu-btn">開始閱讀</button>
+                    </div>
+                    <div class="edu-card" onclick="showEduModal(2)">
+                        <h4><i class="fas fa-running"></i> 運動建議</h4>
+                        <p>適合糖尿病患者的運動類型、強度與頻率建議。</p>
+                        <button class="edu-btn">開始閱讀</button>
+                    </div>
+                    <div class="edu-card" onclick="showEduModal(3)">
+                        <h4><i class="fas fa-syringe"></i> 藥物與胰島素使用</h4>
+                        <p>常見口服藥與胰島素注射技巧、注意事項。</p>
+                        <button class="edu-btn">開始閱讀</button>
+                    </div>
+                    <div class="edu-card" onclick="showEduModal(4)">
+                        <h4><i class="fas fa-shoe-prints"></i> 足部照護</h4>
+                        <p>預防糖尿病足的日常照護與警訊辨識。</p>
+                        <button class="edu-btn">開始閱讀</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </main>
+</div>
+
+<!-- 簡單衛教彈窗示範 -->
+<div id="edu-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; align-items:center; justify-content:center;">
+    <div style="background:white; max-width:500px; width:90%; border-radius:12px; padding:25px; box-shadow:0 10px 30px rgba(0,0,0,0.2);">
+        <h3 id="modal-title" style="margin-bottom:15px; color:var(--primary-color);"></h3>
+        <div id="modal-content" style="line-height:1.7; color:#444; margin-bottom:20px;"></div>
+        <button onclick="closeEduModal()" style="padding:10px 20px; background:var(--primary-color); color:white; border:none; border-radius:6px; cursor:pointer;">關閉</button>
+    </div>
 </div>
 
 <script>
     // 設置今天日期
     document.getElementById('data-date').innerText = new Date().toLocaleDateString('zh-TW');
 
-    // 執行 FHIR 認證回傳處理
+    // FHIR 認證處理
     FHIR.oauth2.ready()
         .then(client => {
             console.log("SMART Client Ready:", client);
 
-            // 更新 UI 狀態
+            // 隱藏載入畫面
             document.getElementById('loading-overlay').style.display = 'none';
             const authStatus = document.getElementById('auth-status');
             authStatus.innerText = 'OAuth 驗證成功';
             authStatus.classList.add('status-verified');
 
-            // 1. 取得病患基本資料 (實際 FHIR API 呼叫)
+            // 取得病患資料
             client.patient.read().then(patient => {
                 let name = "未知病患";
                 if (patient.name && patient.name.length > 0) {
@@ -185,12 +372,8 @@
                 document.querySelector('.patient-details h2').innerText = "無法讀取病患";
             });
 
-            // 2. 這裡模擬從共照網 API 取得的品質數據
-            // 在實際環境中，您可能需要呼叫 client.request 或 client.search 
-            // 來讀取此病患的 Observation 或 MeasureReport。
-            
+            // 模擬品質數據動畫
             setTimeout(() => {
-                // 模擬數據填充與 UI 更新
                 animateValue('hba1c-val', 0, 92, 1000);
                 animateValue('eye-val', 0, 85, 1000);
                 animateValue('acr-val', 0, 68, 1000);
@@ -206,22 +389,52 @@
             `;
         });
 
-    // 數據數字跑馬燈動畫效果
+    // 數字動畫
     function animateValue(id, start, end, duration) {
         if (start === end) return;
         const range = end - start;
         let current = start;
-        const increment = end > start? 1 : -1;
+        const increment = end > start ? 1 : -1;
         const stepTime = Math.abs(Math.floor(duration / range));
         const obj = document.getElementById(id);
         const timer = setInterval(function() {
             current += increment;
             obj.innerHTML = current;
-            if (current == end) {
-                clearInterval(timer);
-            }
+            if (current == end) clearInterval(timer);
         }, stepTime);
     }
+
+    // 衛教彈窗功能
+    function showEduModal(id) {
+        const modal = document.getElementById('edu-modal');
+        const title = document.getElementById('modal-title');
+        const content = document.getElementById('modal-content');
+
+        if (id === 1) {
+            title.innerText = "飲食控制";
+            content.innerHTML = `<p>糖尿病飲食的核心是「定時定量、均衡攝取」。建議每天碳水化合物控制在 45-60% 總熱量，選擇全穀類、蔬菜及優質蛋白質。避免含糖飲料與過度加工食品。</p><p>小技巧：使用「我的餐盤」概念，將盤子分成 ½ 蔬菜、¼ 蛋白質、¼ 碳水化合物。</p>`;
+        } else if (id === 2) {
+            title.innerText = "運動建議";
+            content.innerHTML = `<p>每週至少 150 分鐘中等強度有氧運動（如快走、游泳、騎腳踏車）。建議每週 2-3 天進行阻力訓練，幫助提升胰島素敏感度。</p><p>運動前後請監測血糖，避免低血糖發生。</p>`;
+        } else if (id === 3) {
+            title.innerText = "藥物與胰島素使用";
+            content.innerHTML = `<p>按時服藥非常重要。口服降血糖藥不可任意停藥。使用胰島素時，注意注射部位輪替，避免脂肪增生。出現低血糖症狀（冒冷汗、手抖、心悸）時，請立即補充 15g 快速糖類。</p>`;
+        } else if (id === 4) {
+            title.innerText = "足部照護";
+            content.innerHTML = `<p>每天檢查腳部是否有傷口、紅腫、水泡。穿寬鬆透氣鞋襪，避免赤腳行走。修剪指甲時應平剪，避免剪太短。發現任何異常請立即回診。</p>`;
+        }
+
+        modal.style.display = 'flex';
+    }
+
+    function closeEduModal() {
+        document.getElementById('edu-modal').style.display = 'none';
+    }
+
+    // 點擊彈窗背景也可關閉
+    document.getElementById('edu-modal').addEventListener('click', function(e) {
+        if (e.target === this) closeEduModal();
+    });
 </script>
 
 </body>
