@@ -234,8 +234,21 @@
     <div class="patient-summary">
         <div class="avatar-circle"><i class="fas fa-user"></i></div>
         <div>
-            <h2 id="patient-name" style="font-size: 1.1rem; margin-bottom: 2px;">讀取中...</h2>
-            <p id="patient-id" style="font-size: 0.8rem; color: var(--text-muted);">FHIR ID: --</p>
+            <h2 id="patient-name" style="font-size: 1.1rem; font-weight: 700; margin-bottom: 8px;">讀取中...</h2>
+            <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+                <span style="display:flex; align-items:center; gap:5px; font-size:0.8rem; color:var(--text-muted);">
+                    <i class="fas fa-venus-mars" style="color:var(--primary);"></i>
+                    性別：<strong id="patient-gender" style="color:var(--text-main);">--</strong>
+                </span>
+                <span style="display:flex; align-items:center; gap:5px; font-size:0.8rem; color:var(--text-muted);">
+                    <i class="fas fa-birthday-cake" style="color:var(--primary);"></i>
+                    年齡：<strong id="patient-age" style="color:var(--text-main);">--</strong>
+                </span>
+                <span style="display:flex; align-items:center; gap:5px; font-size:0.8rem; color:var(--text-muted);">
+                    <i class="fas fa-id-card" style="color:var(--primary);"></i>
+                    病歷號：<strong id="patient-id" style="color:var(--text-main); font-family: monospace;">--</strong>
+                </span>
+            </div>
         </div>
         <div style="margin-left: auto; text-align: right;">
             <div class="status-tag tag-good">個案管理中</div>
@@ -312,9 +325,30 @@
             authStatus.className = 'status-tag tag-good';
 
             client.patient.read().then(p => {
-                const name = p.name ? p.name[0].text || p.name[0].family : "匿名病患";
+                // 姓名
+                const name = p.name ? (p.name[0].text || `${p.name[0].family || ''}${(p.name[0].given || []).join(' ')}`.trim()) : "匿名病患";
                 document.getElementById('patient-name').innerText = name;
-                document.getElementById('patient-id').innerText = `FHIR ID: ${p.id}`;
+
+                // 性別
+                const genderMap = { male: '男', female: '女', other: '其他', unknown: '不明' };
+                document.getElementById('patient-gender').innerText = genderMap[p.gender] || p.gender || '不明';
+
+                // 年齡（由 birthDate 計算）
+                if (p.birthDate) {
+                    const birth = new Date(p.birthDate);
+                    const today = new Date();
+                    let age = today.getFullYear() - birth.getFullYear();
+                    if (today.getMonth() < birth.getMonth() || (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate())) age--;
+                    document.getElementById('patient-age').innerText = `${age} 歲`;
+                }
+
+                // 病歷號（優先取 MR identifier，退回 resource.id）
+                let pid = p.id || '--';
+                if (p.identifier && p.identifier.length > 0) {
+                    const mr = p.identifier.find(i => i.type?.coding?.some(c => c.code === 'MR'));
+                    pid = (mr || p.identifier[0]).value || pid;
+                }
+                document.getElementById('patient-id').innerText = pid;
             });
 
             // 模擬加載數據並繪圖
