@@ -123,7 +123,6 @@
             transition: width 0.5s ease-in-out; 
         }
 
-        /* ==================== 強化專業衛教區 ==================== */
         .education-section {
             background-color: var(--card-bg);
             padding: 30px;
@@ -210,6 +209,28 @@
             0% { transform: rotate(0deg); } 
             100% { transform: rotate(360deg); } 
         }
+
+        /* 彈窗樣式 */
+        #edu-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.65);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        #edu-modal .modal-content {
+            background: white;
+            max-width: 560px;
+            width: 92%;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+            max-height: 92vh;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
@@ -294,7 +315,7 @@
                 </div>
             </div>
 
-            <!-- 專業糖尿病衛教專區（已強化） -->
+            <!-- 專業糖尿病衛教專區 -->
             <div class="education-section">
                 <div class="section-title">
                     <i class="fas fa-book-medical"></i>
@@ -302,17 +323,16 @@
                     <span style="margin-left:auto; font-size:0.9rem; color:#7f8c8d;">依台灣糖尿病學會指引與 ADA Standards of Care 編撰</span>
                 </div>
                 <div class="education-grid" id="education-grid">
-                    <!-- JavaScript 動態產生更專業的衛教卡片 -->
+                    <!-- JavaScript 動態產生 -->
                 </div>
             </div>
-
         </div>
     </main>
 </div>
 
 <!-- 專業衛教彈窗 -->
-<div id="edu-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.65); z-index:2000; align-items:center; justify-content:center;">
-    <div style="background:white; max-width:560px; width:92%; border-radius:12px; padding:30px; box-shadow:0 15px 35px rgba(0,0,0,0.25); max-height:92vh; overflow-y:auto;">
+<div id="edu-modal">
+    <div class="modal-content">
         <h3 id="modal-title" style="margin-bottom:18px; color:var(--primary-color); font-size:1.45rem;"></h3>
         <div id="modal-content" style="line-height:1.75; color:#333; font-size:1.02rem;"></div>
         <div style="margin-top:25px; text-align:right;">
@@ -344,16 +364,13 @@
                 document.querySelector('.patient-details h2').innerText = "無法讀取病患資料";
             });
 
-            // 模擬品質數據動畫
+            // 模擬品質數據動畫 + 產生衛教卡片
             setTimeout(() => {
                 animateValue('hba1c-val', 0, 92, 1200);
                 animateValue('eye-val', 0, 85, 1200);
                 animateValue('acr-val', 0, 68, 1200);
-                
-                // 產生專業衛教卡片
                 generateProfessionalEducationCards();
             }, 600);
-
         })
         .catch(error => {
             console.error("Auth Error:", error);
@@ -381,7 +398,7 @@
         }, stepTime);
     }
 
-    // ==================== 專業衛教卡片產生 ====================
+    // 產生專業衛教卡片
     function generateProfessionalEducationCards() {
         const grid = document.getElementById('education-grid');
         grid.innerHTML = '';
@@ -391,41 +408,31 @@
                 id: 1,
                 icon: "fas fa-apple-alt",
                 title: "醫學營養治療（MNT）與飲食控制",
-                desc: "依據個別化醫學營養治療原則，控制碳水化合物攝取總量與升糖指數（GI），維持理想體重與血糖穩定。",
-                full: `<p>糖尿病醫學營養治療（Medical Nutrition Therapy, MNT）為血糖控制基礎。建議每日碳水化合物占總熱量 45–60%，優先選擇低升糖指數（GI）全穀類、豐富膳食纖維之蔬菜及優質蛋白質。避免含糖飲料與精製碳水化合物。</p>
-                       <p>實務應用：「我的餐盤」法則：½ 蔬菜、¼ 蛋白質、¼ 碳水化合物。體重過重者建議 5–10% 減重以提升胰島素敏感度。</p>`
+                desc: "依據個別化醫學營養治療原則，控制碳水化合物攝取總量與升糖指數（GI），維持理想體重與血糖穩定。"
             },
             {
                 id: 2,
                 icon: "fas fa-running",
                 title: "運動處方與體能活動",
-                desc: "每週累積至少 150 分鐘中等強度有氧運動，合併 2–3 天阻力訓練，提升胰島素敏感度與心肺適能。",
-                full: `<p>根據 ADA 與台灣糖尿病學會指引，糖尿病患者每週應進行至少 150 分鐘中等強度有氧運動（快走、游泳、腳踏車等），並搭配 2–3 天阻力訓練。</p>
-                       <p>運動可顯著改善血糖控制、降低 HbA1c，並減少心血管事件風險。運動前後需監測血糖，避免運動性低血糖。</p>`
+                desc: "每週累積至少 150 分鐘中等強度有氧運動，合併 2–3 天阻力訓練，提升胰島素敏感度與心肺適能。"
             },
             {
                 id: 3,
                 icon: "fas fa-syringe",
                 title: "藥物治療與胰島素使用原則",
-                desc: "依據個別化治療目標選擇口服降血糖藥或胰島素，注意藥物作用機轉、常見副作用及注射技術。",
-                full: `<p>第二型糖尿病藥物治療應依共病、心血管風險、腎功能及病人偏好進行個別化選擇。常見藥物包括 metformin、SGLT2 抑制劑、GLP-1 受體促效劑等具心腎保護效果之藥物。</p>
-                       <p>使用胰島素時需注意輪替注射部位，避免脂肪增生。低血糖為重要副作用，應教導病人辨識與處理原則。</p>`
+                desc: "依據個別化治療目標選擇口服降血糖藥或胰島素，注意藥物作用機轉、常見副作用及注射技術。"
             },
             {
                 id: 4,
                 icon: "fas fa-shoe-prints",
                 title: "糖尿病足部照護與預防",
-                desc: "每日足部自我檢查、正確修剪指甲、選擇合適鞋襪，早期辨識高風險足部病變，預防糖尿病足潰瘍與截肢。",
-                full: `<p>糖尿病周邊神經病變與周邊動脈疾病為糖尿病足主要危險因子。每日應以溫水清洗足部並徹底擦乾，特別注意足趾間。指甲應平剪，避免剪得過短或過圓。</p>
-                       <p>發現紅腫、破皮、水泡、潰瘍或足部溫度異常時，應立即就醫。建議每年至少接受一次足部風險評估。</p>`
+                desc: "每日足部自我檢查、正確修剪指甲、選擇合適鞋襪，早期辨識高風險足部病變，預防糖尿病足潰瘍與截肢。"
             },
             {
                 id: 5,
                 icon: "fas fa-tachometer-alt",
                 title: "血糖自我監測（SMBG）與低血糖處理",
-                desc: "建立規律血糖自我監測習慣，熟悉血糖目標值，並正確處理低血糖（血糖 ≤ 70 mg/dL）緊急情況。",
-                full: `<p>血糖自我監測（Self-Monitoring of Blood Glucose, SMBG）有助於了解飲食、運動與藥物對血糖之影響。建議至少每日測量空腹與餐後血糖。</p>
-                       <p>低血糖定義為血糖 ≤ 70 mg/dL，出現冒冷汗、手抖、心悸、意識改變時，應立即補充 15 克快速吸收碳水化合物（15-15 法則），15 分鐘後再次測量。</p>`
+                desc: "建立規律血糖自我監測習慣，熟悉血糖目標值，並正確處理低血糖（血糖 ≤ 70 mg/dL）緊急情況。"
             }
         ];
 
@@ -442,24 +449,50 @@
         });
     }
 
-    // 專業衛教彈窗
+    // 顯示衛教彈窗（已補完所有內容）
     function showEduModal(id) {
         const modal = document.getElementById('edu-modal');
         const titleEl = document.getElementById('modal-title');
         const contentEl = document.getElementById('modal-content');
 
-        const items = {
-            1: { title: "醫學營養治療（MNT）與飲食控制", content: document.querySelectorAll('.education-grid .edu-card')[0] ? /* 可再優化 */ '' : '' },
-            // 以下使用上面定義的 full 內容（為簡化，這裡直接硬編碼，實際可再抽取）
-        };
+        let title = '';
+        let content = '';
 
-        // 直接對應內容
         if (id === 1) {
-            titleEl.innerText = "醫學營養治療（MNT）與飲食控制";
-            contentEl.innerHTML = `<p>糖尿病醫學營養治療（Medical Nutrition Therapy, MNT）為血糖控制基礎。建議每日碳水化合物占總熱量 45–60%，優先選擇低升糖指數（GI）全穀類、豐富膳食纖維之蔬菜及優質蛋白質。避免含糖飲料與精製碳水化合物。</p><p>實務應用：「我的餐盤」法則：½ 蔬菜、¼ 蛋白質、¼ 碳水化合物。體重過重者建議 5–10% 減重以提升胰島素敏感度。</p>`;
+            title = "醫學營養治療（MNT）與飲食控制";
+            content = `<p>糖尿病醫學營養治療（Medical Nutrition Therapy, MNT）為血糖控制基礎。建議每日碳水化合物占總熱量 45–60%，優先選擇低升糖指數（GI）全穀類、豐富膳食纖維之蔬菜及優質蛋白質。避免含糖飲料與精製碳水化合物。</p>
+                       <p>實務應用：「我的餐盤」法則：½ 蔬菜、¼ 蛋白質、¼ 碳水化合物。體重過重者建議 5–10% 減重以提升胰島素敏感度。</p>`;
         } else if (id === 2) {
-            titleEl.innerText = "運動處方與體能活動";
-            contentEl.innerHTML = `<p>根據 ADA 與台灣糖尿病學會指引，糖尿病患者每週應進行至少 150 分鐘中等強度有氧運動（快走、游泳、腳踏車等），並搭配 2–3 天阻力訓練。</p><p>運動可顯著改善血糖控制、降低 HbA1c，並減少心血管事件風險。運動前後需監測血糖，避免運動性低血糖。</p>`;
+            title = "運動處方與體能活動";
+            content = `<p>根據 ADA 與台灣糖尿病學會指引，糖尿病患者每週應進行至少 150 分鐘中等強度有氧運動（快走、游泳、腳踏車等），並搭配 2–3 天阻力訓練。</p>
+                       <p>運動可顯著改善血糖控制、降低 HbA1c，並減少心血管事件風險。運動前後需監測血糖，避免運動性低血糖。</p>`;
         } else if (id === 3) {
-            titleEl.innerText = "藥物治療與胰島素使用原則";
-            contentEl.innerHTML = `<p>第二型糖尿病藥物治療應依共病、心血管風險、腎功能及病人偏好進行個別化選擇。常見藥物包括 metformin、SGLT2 抑制劑、GLP-1 受體促效劑等具心腎保護效果之藥物。</p><
+            title = "藥物治療與胰島素使用原則";
+            content = `<p>第二型糖尿病藥物治療應依共病、心血管風險、腎功能及病人偏好進行個別化選擇。常見藥物包括 metformin、SGLT2 抑制劑、GLP-1 受體促效劑等具心腎保護效果之藥物。</p>
+                       <p>使用胰島素時需注意輪替注射部位，避免脂肪增生。低血糖為重要副作用，應教導病人辨識與處理原則。</p>`;
+        } else if (id === 4) {
+            title = "糖尿病足部照護與預防";
+            content = `<p>糖尿病周邊神經病變與周邊動脈疾病為糖尿病足主要危險因子。每日應以溫水（不超過38°C）清洗足部並徹底擦乾，特別注意足趾間。指甲應平剪，避免剪得過短或過圓。</p>
+                       <p>每天檢查雙腳是否有紅腫、水泡、破皮、厚繭或溫度異常。若視力不佳，可請家人協助。發現異常應立即就醫。建議每年至少接受一次足部風險評估，並避免赤腳走路或使用熱水袋直接接觸足部。</p>`;
+        } else if (id === 5) {
+            title = "血糖自我監測（SMBG）與低血糖處理";
+            content = `<p>血糖自我監測（Self-Monitoring of Blood Glucose, SMBG）有助於了解飲食、運動與藥物對血糖之影響。建議至少每日測量空腹與餐後血糖。</p>
+                       <p>低血糖定義為血糖 ≤ 70 mg/dL，出現冒冷汗、手抖、心悸、意識改變時，應立即補充 15 克快速吸收碳水化合物（15-15 法則），15 分鐘後再次測量血糖。若仍低於 70 mg/dL，重複補充。</p>`;
+        }
+
+        titleEl.innerText = title;
+        contentEl.innerHTML = content;
+        modal.style.display = 'flex';
+    }
+
+    function closeEduModal() {
+        document.getElementById('edu-modal').style.display = 'none';
+    }
+
+    // 點擊彈窗背景關閉（選用）
+    document.getElementById('edu-modal').addEventListener('click', function(e) {
+        if (e.target === this) closeEduModal();
+    });
+</script>
+</body>
+</html>
