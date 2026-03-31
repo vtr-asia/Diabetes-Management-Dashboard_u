@@ -3,287 +3,405 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智慧用藥安全監測 Pro | Stage 2 認證版</title>
-    <script src="https://cdn.jsdelivr.net/npm/fhirclient@2.6.3/build/fhir-client.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>糖尿病共照網 - 專業品質管理儀表板</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fhirclient/build/fhir-client.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
-        body { font-family: 'Noto Sans TC', sans-serif; }
-        
-        .patient-header {
-            background: linear-gradient(135deg, #10b981, #34d399);
-            color: white;
-            padding: 24px;
-            border-radius: 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.2);
+        :root {
+            --primary: #2563eb;
+            --primary-light: #eff6ff;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --bg-body: #f8fafc;
+            --sidebar-width: 260px;
+            --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
         }
-        .patient-name {
-            font-size: 32px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Inter', "PingFang TC", sans-serif; 
+            background-color: var(--bg-body); 
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
         }
-        .patient-meta {
-            font-size: 18px;
-            opacity: 0.95;
-            margin-top: 8px;
-        }
-        
-        .med-card {
+
+        /* 側邊導覽列 */
+        aside {
+            width: var(--sidebar-width);
             background: white;
-            border-radius: 20px;
-            padding: 20px;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-right: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
         }
+
+        .sidebar-header {
+            padding: 24px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        nav { flex: 1; padding: 12px; }
+        nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: var(--text-muted);
+            border-radius: 8px;
+            transition: all 0.2s;
+            margin-bottom: 4px;
+        }
+        nav a.active, nav a:hover {
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        /* 主內容區 */
+        main {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 32px;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        /* 病患資訊精簡化 */
+        .patient-summary {
+            background: white;
+            padding: 20px 24px;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+        .avatar-circle {
+            width: 48px; height: 48px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        /* 數據指標卡片優化 */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        .metric-card {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid #f1f5f9;
+        }
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-bottom: 12px;
+        }
+        .metric-value-row {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .value-large { font-size: 2rem; font-weight: 700; }
+        .unit { color: var(--text-muted); }
+        
+        .status-tag {
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .tag-good { background: #dcfce7; color: #15803d; }
+        .tag-warn { background: #fef3c7; color: #92400e; }
+        .tag-danger { background: #fee2e2; color: #b91c1c; }
+
+        .chart-container { height: 60px; margin-top: 10px; }
+
+        /* 衛教區塊 */
+        .section-card {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+        }
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .edu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 16px;
+        }
+        .edu-item {
+            padding: 16px;
+            border: 1px solid #f1f5f9;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .edu-item:hover { border-color: var(--primary); background: var(--primary-light); }
+        .edu-item i { color: var(--primary); margin-bottom: 12px; display: block; }
+        .edu-item h4 { font-size: 0.95rem; margin-bottom: 4px; }
+
+        /* Modal 優化 */
+        #edu-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.6); z-index: 100; align-items: center; justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .modal-body {
+            background: white; width: 90%; max-width: 500px; padding: 32px; border-radius: 20px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
+
+        #loading-overlay {
+            position: fixed; inset: 0; background: white; z-index: 1000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .loader {
+            width: 48px; height: 48px; border: 5px solid var(--primary-light);
+            border-bottom-color: var(--primary); border-radius: 50%;
+            animation: rotation 1s linear infinite;
+        }
+        @keyframes rotation { 0% { transform: rotate(0deg) } 100% { transform: rotate(360deg) } }
     </style>
 </head>
-<body class="bg-gray-50">
+<body>
 
-    <div id="loader" class="fixed inset-0 bg-white/95 z-[9999] flex flex-col items-center justify-center">
-        <div class="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-        <p class="mt-4 text-emerald-800 font-bold text-lg" id="loader-text">正在建立安全連線...</p>
+<div id="loading-overlay">
+    <div class="loader"></div>
+    <p style="margin-top: 16px; color: var(--text-muted);">正在同步臨床數據...</p>
+</div>
+
+<aside>
+    <div class="sidebar-header">
+        <i class="fas fa-notes-medical"></i>
+        <span>DM Care Pro</span>
+    </div>
+    <nav>
+        <a href="#" class="active"><i class="fas fa-th-large"></i> 儀表板</a>
+        <a href="#"><i class="fas fa-user-md"></i> 臨床記錄</a>
+        <a href="#"><i class="fas fa-chart-line"></i> 趨勢分析</a>
+        <a href="#"><i class="fas fa-cog"></i> 設定</a>
+    </nav>
+</aside>
+
+<main>
+    <div class="top-bar">
+        <div>
+            <h1 style="font-size: 1.5rem; font-weight: 700;">品質管理總覽</h1>
+            <p style="color: var(--text-muted); font-size: 0.875rem;">數據更新於：<span id="update-time">--</span></p>
+        </div>
+        <div id="auth-status" class="status-tag" style="background: #e2e8f0;">驗證中</div>
     </div>
 
-    <div class="max-w-7xl mx-auto min-h-screen">
-        <!-- 頂部導航 -->
-        <nav class="bg-white border-b px-8 py-5 flex items-center justify-between shadow-sm">
-            <div class="flex items-center gap-3">
-                <div class="bg-emerald-600 text-white p-2 rounded-lg text-2xl">🩺</div>
-                <h1 class="text-xl font-bold text-gray-800">智慧用藥安全監測 <span class="text-emerald-500">Pro_u</span></h1>
-            </div>
-        </nav>
+    <div class="patient-summary">
+        <div class="avatar-circle"><i class="fas fa-user"></i></div>
+        <div>
+            <h2 id="patient-name" style="font-size: 1.1rem; margin-bottom: 2px;">讀取中...</h2>
+            <p id="patient-id" style="font-size: 0.8rem; color: var(--text-muted);">FHIR ID: --</p>
+        </div>
+        <div style="margin-left: auto; text-align: right;">
+            <div class="status-tag tag-good">個案管理中</div>
+        </div>
+    </div>
 
-        <!-- 病人基本資料（大字） -->
-        <div id="patient-header" class="hidden patient-header mx-8 mt-6">
-            <div class="flex items-center gap-6">
-                <div class="w-20 h-20 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center text-5xl shadow-inner">
-                    👤
-                </div>
-                <div>
-                    <div id="p-name" class="patient-name">載入中...</div>
-                    <div id="p-meta" class="patient-meta">正在讀取病人資料...</div>
-                </div>
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-header">
+                <span>糖化血色素 (HbA1c)</span>
+                <span class="status-tag tag-good">達標</span>
             </div>
+            <div class="metric-value-row">
+                <span id="hba1c-val" class="value-large">--</span>
+                <span class="unit">%</span>
+            </div>
+            <div class="chart-container"><canvas id="hba1cChart"></canvas></div>
         </div>
 
-        <main class="p-8">
-            <div id="main-content" class="grid grid-cols-1 lg:grid-cols-3 gap-6 opacity-0 transition-opacity duration-500">
-
-                <!-- 最新收縮壓 -->
-                <div class="bg-white p-6 rounded-3xl border shadow-sm">
-                    <h3 class="text-gray-400 text-xs font-bold uppercase mb-2">最新收縮壓</h3>
-                    <div class="text-5xl font-black text-emerald-600" id="v-sbp">--</div>
-                    <p class="text-gray-400 text-xs mt-2" id="v-sbp-time">最後量測：未偵測</p>
-                </div>
-
-                <!-- 臨床診斷 -->
-                <div class="bg-white p-6 rounded-3xl border shadow-sm">
-                    <h3 class="text-gray-400 text-xs font-bold uppercase mb-2">臨床診斷 (Active)</h3>
-                    <div id="cond-list" class="space-y-2 max-h-48 overflow-y-auto">
-                        <p class="text-gray-300 text-sm">讀取中...</p>
-                    </div>
-                </div>
-
-                <!-- 用藥紀錄（新增重點卡片） -->
-                <div class="bg-white p-6 rounded-3xl border shadow-sm">
-                    <h3 class="text-gray-400 text-xs font-bold uppercase mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-pills text-emerald-500"></i>
-                        目前用藥紀錄
-                    </h3>
-                    <div id="med-list" class="space-y-3 text-sm">
-                        <p class="text-gray-400">讀取用藥資料中...</p>
-                    </div>
-                </div>
-
-                <!-- CDS 決策支援 -->
-                <div class="lg:col-span-3 bg-gray-900 p-6 rounded-3xl text-white shadow-xl">
-                    <div class="flex items-center gap-2 text-emerald-400 mb-4">
-                        <i class="fa-solid fa-robot"></i>
-                        <span class="font-bold">CDS-Decision Support（用藥安全建議）</span>
-                    </div>
-                    <p id="ai-suggestion" class="text-base leading-relaxed">正在分析病患用藥與臨床指標...</p>
-                </div>
+        <div class="metric-card">
+            <div class="metric-header">
+                <span>眼底檢查率</span>
+                <span class="status-tag tag-warn">待預約</span>
             </div>
-        </main>
+            <div class="metric-value-row">
+                <span id="eye-val" class="value-large">--</span>
+                <span class="unit">%</span>
+            </div>
+            <div class="chart-container"><canvas id="eyeChart"></canvas></div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-header">
+                <span>尿液微量白蛋白 (UACR)</span>
+                <span class="status-tag tag-danger">追蹤中</span>
+            </div>
+            <div class="metric-value-row">
+                <span id="acr-val" class="value-large">--</span>
+                <span class="unit">%</span>
+            </div>
+            <div class="chart-container"><canvas id="acrChart"></canvas></div>
+        </div>
     </div>
 
-    <script>
-        const LOINC_SBP = "8480-6";
+    <div class="section-card">
+        <div class="section-title">
+            <i class="fas fa-lightbulb" style="color: var(--warning);"></i> 個別化衛教建議
+        </div>
+        <div class="edu-grid" id="edu-grid">
+            </div>
+    </div>
+</main>
 
-        async function init() {
-            document.getElementById('loader-text').innerText = "正在進行 SMART on FHIR 認證...";
+<div id="edu-modal">
+    <div class="modal-body">
+        <h3 id="modal-title" style="margin-bottom: 16px; color: var(--primary);"></h3>
+        <div id="modal-content" style="color: var(--text-main); line-height: 1.7; font-size: 0.95rem;"></div>
+        <button onclick="closeModal()" style="margin-top: 24px; width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">確定</button>
+    </div>
+</div>
 
-            try {
-                const smart = await FHIR.oauth2.ready();
-                console.log("✅ SMART 連線成功！Patient ID:", smart.patient.id);
+<script>
+    // 1. 初始化日期
+    document.getElementById('update-time').innerText = new Date().toLocaleDateString('zh-TW');
 
-                document.getElementById('loader-text').innerText = "連線成功，正在讀取病人資料...";
+    // 2. FHIR Client 邏輯
+    FHIR.oauth2.ready()
+        .then(client => {
+            document.getElementById('loading-overlay').style.opacity = '0';
+            setTimeout(() => document.getElementById('loading-overlay').style.display = 'none', 300);
+            
+            const authStatus = document.getElementById('auth-status');
+            authStatus.innerText = '已連接 FHIR Server';
+            authStatus.className = 'status-tag tag-good';
 
-                const pid = smart.patient.id;
+            client.patient.read().then(p => {
+                const name = p.name ? p.name[0].text || p.name[0].family : "匿名病患";
+                document.getElementById('patient-name').innerText = name;
+                document.getElementById('patient-id').innerText = `FHIR ID: ${p.id}`;
+            });
 
-                const [patient, obs, conds, meds] = await Promise.all([
-                    smart.request(`Patient/${pid}`),
-                    smart.request(`Observation?patient=${pid}&code=85354-9&_sort=-date&_count=1`),
-                    smart.request(`Condition?patient=${pid}&clinical-status=active`),
-                    smart.request(`MedicationRequest?patient=${pid}&status=active`)
-                ]);
+            // 模擬加載數據並繪圖
+            renderAllCharts();
+            animateNumbers();
+            generateEdu();
+        })
+        .catch(err => {
+            console.error(err);
+            document.getElementById('loading-overlay').innerHTML = `<p style="color:red">OAuth 驗證失敗，請檢查客戶端設定</p>`;
+        });
 
-                renderData(patient, obs, conds, meds, true);
-
-            } catch (err) {
-                console.error("❌ SMART 認證失敗:", err);
-                document.getElementById('loader-text').innerHTML = `
-                    <div class="text-red-500 p-6 text-center">
-                        <p class="font-bold text-lg">SMART 授權失敗</p>
-                        <p class="text-sm mt-2 opacity-80">${err.message || err}</p>
-                        <p class="text-xs mt-4">切換至 DEMO 模式...</p>
-                    </div>`;
-                setTimeout(loadDemoMode, 1800);
+    // 3. 圖表渲染函數
+    function renderMiniChart(id, color, data) {
+        const ctx = document.getElementById(id).getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['', '', '', '', ''],
+                datasets: [{
+                    data: data,
+                    borderColor: color,
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: true,
+                    backgroundColor: color + '1A', // 10% 透明度
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { x: { display: false }, y: { display: false } }
             }
-        }
+        });
+    }
 
-        async function loadDemoMode() {
-            try {
-                document.getElementById('loader-text').innerText = "進入 DEMO 模式...";
-                const client = new FHIR.Client({ serverUrl: "https://hapi.fhir.tw/fhir" });
+    function renderAllCharts() {
+        renderMiniChart('hba1cChart', '#10b981', [7.8, 7.5, 7.6, 7.3, 7.2]);
+        renderMiniChart('eyeChart', '#f59e0b', [80, 82, 81, 85, 85]);
+        renderMiniChart('acrChart', '#ef4444', [60, 62, 65, 67, 68]);
+    }
 
-                const patBundle = await client.request("Patient?_count=1");
-                const patient = patBundle.entry?.[0]?.resource;
-                if (!patient) throw new Error("無法取得測試病患");
-
-                const pid = patient.id;
-
-                const [obs, conds, meds] = await Promise.all([
-                    client.request(`Observation?patient=${pid}&code=85354-9&_sort=-date&_count=1`),
-                    client.request(`Condition?patient=${pid}&clinical-status=active`),
-                    client.request(`MedicationRequest?patient=${pid}&status=active`)
-                ]);
-
-                renderData(patient, obs, conds, meds, false);
-
-            } catch (e) {
-                console.error(e);
-                document.getElementById('loader-text').innerHTML = `
-                    <div class="text-red-500 p-6 text-center">
-                        <p class="font-bold">DEMO 模式連線失敗</p>
-                        <button onclick="location.reload()" class="mt-4 px-6 py-2 bg-gray-800 text-white rounded-xl">重試</button>
-                    </div>`;
-            }
-        }
-
-        function renderData(patient, obs, conds, meds, isSmart) {
-            // ==================== 病人基本資料 ====================
-            const patientHeader = document.getElementById('patient-header');
-            patientHeader.classList.remove('hidden');
-
-            const name = patient.name ? 
-                (patient.name[0].text || 
-                 `${patient.name[0].family || ''} ${patient.name[0].given ? patient.name[0].given.join(' ') : ''}`.trim()) 
-                : "匿名病患";
-
-            document.getElementById('p-name').innerText = name;
-
-            let age = "--";
-            if (patient.birthDate) {
-                const birth = new Date(patient.birthDate);
-                age = Math.floor((new Date() - birth) / 31557600000);
-            }
-
-            const genderMap = { male: "男性", female: "女性", other: "其他", unknown: "未知" };
-            const gender = genderMap[patient.gender] || "未知";
-
-            document.getElementById('p-meta').innerHTML = `
-                ${gender}　｜　${age} 歲　｜　病例號：${patient.id}
-            `;
-
-            // ==================== 最新收縮壓 ====================
-            let sbpValue = "--";
-            let sbpTime = "最後量測：未偵測";
-            let aiText = "✅ 目前生理指標穩定。";
-
-            if (obs.entry && obs.entry.length > 0) {
-                const res = obs.entry[0].resource;
-                const sbpComp = res.component?.find(c => 
-                    c.code.coding?.some(cc => cc.code === LOINC_SBP)
-                );
-                if (sbpComp?.valueQuantity) {
-                    sbpValue = sbpComp.valueQuantity.value;
-                    sbpTime = `最後量測：${new Date(res.effectiveDateTime).toLocaleDateString('zh-TW')}`;
-                    if (sbpValue > 140) {
-                        aiText = `<span class="text-red-400 font-bold">🚨 血壓警示：</span>收縮壓 ${sbpValue} mmHg 偏高，建議確認用藥。`;
-                    }
+    // 4. 數字動畫
+    function animateNumbers() {
+        const configs = [
+            { id: 'hba1c-val', end: 92 },
+            { id: 'eye-val', end: 85 },
+            { id: 'acr-val', end: 68 }
+        ];
+        configs.forEach(conf => {
+            let start = 0;
+            const step = () => {
+                start += 2;
+                if(start <= conf.end) {
+                    document.getElementById(conf.id).innerText = start;
+                    requestAnimationFrame(step);
+                } else {
+                    document.getElementById(conf.id).innerText = conf.end;
                 }
-            }
+            };
+            step();
+        });
+    }
 
-            document.getElementById('v-sbp').innerText = sbpValue;
-            document.getElementById('v-sbp-time').innerText = sbpTime;
+    // 5. 衛教內容
+    function generateEdu() {
+        const items = [
+            { id: 1, icon: 'fa-apple-alt', title: '飲食控制', content: '建議採取低 GI 飲食，並控制每餐碳水化合物攝取量。' },
+            { id: 2, icon: 'fa-running', title: '規律運動', content: '每週建議 150 分鐘中等強度運動，如快走、游泳。' },
+            { id: 3, icon: 'fa-eye', title: '定期眼底檢查', content: '糖尿病視網膜病變早期無症狀，每年需檢查一次。' }
+        ];
+        const grid = document.getElementById('edu-grid');
+        items.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'edu-item';
+            div.innerHTML = `<i class="fas ${item.icon} fa-lg"></i><h4>${item.title}</h4><p style="font-size:0.8rem; color:var(--text-muted)">查看專業指引...</p>`;
+            div.onclick = () => {
+                document.getElementById('modal-title').innerText = item.title;
+                document.getElementById('modal-content').innerText = item.content;
+                document.getElementById('edu-modal').style.display = 'flex';
+            };
+            grid.appendChild(div);
+        });
+    }
 
-            // ==================== 臨床診斷 ====================
-            const condHtml = (conds.entry || []).map(e => `
-                <div class="text-sm bg-gray-50 p-3 rounded-xl border border-gray-100">
-                    • ${e.resource.code?.text || "未命名診斷"}
-                </div>
-            `).join('') || '<p class="text-gray-400 text-sm">無活動中診斷</p>';
-            document.getElementById('cond-list').innerHTML = condHtml;
-
-            // ==================== 用藥紀錄（新增重點） ====================
-            const medListEl = document.getElementById('med-list');
-            if (meds.entry && meds.entry.length > 0) {
-                let html = '';
-                meds.entry.forEach(item => {
-                    const med = item.resource;
-                    const medName = med.medicationCodeableConcept?.text || 
-                                   med.medicationCodeableConcept?.coding?.[0]?.display || 
-                                   "未知藥物";
-                    
-                    const dosage = med.dosageInstruction?.[0]?.text || 
-                                  (med.dosageInstruction?.[0]?.doseAndRate?.[0]?.doseQuantity?.value ? 
-                                   `${med.dosageInstruction[0].doseAndRate[0].doseQuantity.value} ${med.dosageInstruction[0].doseAndRate[0].doseQuantity.unit || ''}` : 
-                                   "劑量未指定");
-                    
-                    const frequency = med.dosageInstruction?.[0]?.timing?.code?.text || "頻率未指定";
-
-                    html += `
-                        <div class="flex justify-between items-center bg-emerald-50 p-4 rounded-2xl border border-emerald-100">
-                            <div>
-                                <div class="font-medium text-gray-800">${medName}</div>
-                                <div class="text-xs text-gray-500 mt-1">${dosage}　｜　${frequency}</div>
-                            </div>
-                            <div class="text-emerald-600">
-                                <i class="fa-solid fa-check-circle"></i>
-                            </div>
-                        </div>`;
-                });
-                medListEl.innerHTML = html;
-            } else {
-                medListEl.innerHTML = `
-                    <div class="bg-gray-50 p-8 rounded-2xl text-center">
-                        <p class="text-gray-400">目前無活躍用藥紀錄</p>
-                    </div>`;
-            }
-
-            // ==================== CDS 建議 ====================
-            let medSummary = meds.entry && meds.entry.length > 0 
-                ? `<br><span class="text-emerald-400">💊 活躍用藥 ${meds.entry.length} 項</span>` 
-                : `<br><span class="text-gray-400">目前無活躍用藥</span>`;
-
-            document.getElementById('ai-suggestion').innerHTML = aiText + medSummary;
-
-            // 顯示主內容
-            document.getElementById('main-content').classList.remove('opacity-0');
-            document.getElementById('loader').classList.add('hidden');
-
-            if (!isSmart) {
-                const badge = document.createElement('div');
-                badge.className = "fixed top-6 right-8 bg-amber-100 text-amber-700 text-xs font-bold px-4 py-1.5 rounded-2xl shadow";
-                badge.innerHTML = `🔬 DEMO 模式 (hapi.fhir.tw)`;
-                document.body.appendChild(badge);
-            }
-        }
-
-        window.onload = init;
-    </script>
+    function closeModal() { document.getElementById('edu-modal').style.display = 'none'; }
+</script>
 </body>
 </html>
