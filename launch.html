@@ -7,11 +7,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script>
-        // 憑證資訊整合
+        // ==================== 憑證與設定 ====================
         const CLIENT_ID = "cc344727-6f90-496c-94fd-c7829aa9a51d";
         const CLIENT_SECRET = "79f04b56b33491716c0880af72cdef7d3f0629111421cedd18353651cd313d9e"; 
-        const REDIRECT_URI = window.location.origin + "/index.html";
         const SCOPES = "launch patient/*.read openid fhirUser profile";
+
+        // 正確的 REDIRECT_URI（已修正 GitHub Pages 路徑問題）
+        const REDIRECT_URI = window.location.origin + "/Diabetes-Management-Dashboard_u/index.html";
 
         function getUrlParams() {
             const params = new URLSearchParams(window.location.search);
@@ -37,28 +39,37 @@
 
             document.getElementById('status').innerHTML = `
                 <i class="fa-solid fa-spinner fa-spin text-5xl text-blue-400"></i>
-                <p class="mt-6 text-slate-300 text-xl">正在連線至衛福部 FHIR 沙盒進行授權...</p>
+                <p class="mt-6 text-slate-300 text-xl">正在連線至 FHIR 伺服器進行授權...</p>
                 <p class="text-xs text-slate-500 mt-3">iss: ${iss}</p>
             `;
 
             try {
-                // 1. 自動偵測 SMART 配置
+                // 1. 取得 SMART 配置
                 const configUrl = iss.replace(/\/$/, '') + '/.well-known/smart-configuration';
+                console.log('🔍 取得 SMART 配置:', configUrl);
+
                 const configRes = await fetch(configUrl, { cache: 'no-cache' });
 
-                if (!configRes.ok) throw new Error(`無法取得 SMART 配置 (${configRes.status})`);
+                if (!configRes.ok) {
+                    throw new Error(`無法取得 SMART 配置 (${configRes.status} ${configRes.statusText})`);
+                }
 
                 const config = await configRes.json();
+                console.log('✅ SMART 配置取得成功:', config);
 
-                // 2. 儲存關鍵參數與 Secret 給 index.html 使用
+                // 2. 儲存參數給 index.html 使用
                 sessionStorage.setItem('fhir_iss', iss);
                 sessionStorage.setItem('fhir_token_url', config.token_endpoint);
                 sessionStorage.setItem('fhir_client_id', CLIENT_ID);
-                sessionStorage.setItem('fhir_client_secret', CLIENT_SECRET); // 加入 Secret 供 Token 交換使用
+                sessionStorage.setItem('fhir_client_secret', CLIENT_SECRET);
                 if (launch) sessionStorage.setItem('fhir_launch', launch);
 
-                // 3. 建構 OAuth 2.0 授權請求
-                const state = btoa(Math.random().toString(36)).slice(0, 20);
+                console.log('📦 參數已儲存至 sessionStorage');
+                console.log('🔀 Redirect URI:', REDIRECT_URI);
+
+                // 3. 建構授權請求
+                const state = btoa(Math.random().toString(36) + Date.now()).slice(0, 30);
+                
                 const authParams = new URLSearchParams({
                     response_type: 'code',
                     client_id: CLIENT_ID,
@@ -70,16 +81,23 @@
                 });
 
                 const authorizeUrl = `${config.authorization_endpoint}?${authParams.toString()}`;
-                console.log('🚀 導向授權頁面:', authorizeUrl);
-                window.location.href = authorizeUrl;
+                
+                console.log('🚀 開始導向授權頁面...');
+                console.log('📍 Authorize URL:', authorizeUrl);
+
+                // 延遲一下再跳轉，讓 console.log 有時間顯示
+                setTimeout(() => {
+                    window.location.href = authorizeUrl;
+                }, 800);
 
             } catch (error) {
-                console.error(error);
+                console.error('❌ Launch 錯誤:', error);
                 document.getElementById('status').innerHTML = `
                     <div class="text-red-400">
                         <i class="fa-solid fa-circle-exclamation text-4xl"></i>
                         <p class="mt-4 text-lg">啟動失敗</p>
-                        <p class="text-sm mt-2">${error.message}</p>
+                        <p class="text-sm mt-2 break-all">${error.message}</p>
+                        <p class="text-xs mt-4 text-slate-500">請檢查 console 詳細錯誤資訊</p>
                     </div>
                 `;
             }
@@ -87,17 +105,26 @@
 
         window.onload = () => {
             const params = getUrlParams();
+            
             if (params.iss) {
+                console.log('🔄 偵測到 EHR Launch 參數，開始執行...');
                 startEHRLaunch();
             } else {
+                // 直接開啟 launch.html 時顯示說明
                 document.getElementById('status').innerHTML = `
                     <div class="max-w-md mx-auto bg-slate-800/70 p-8 rounded-3xl border border-slate-700 text-center">
                         <i class="fa-solid fa-notes-medical text-6xl text-blue-400 mb-4"></i>
                         <h1 class="text-3xl font-black text-white">糖尿病共照網</h1>
                         <p class="text-blue-400 font-mono text-sm mt-1">SMART on FHIR Launch</p>
+                        
                         <div class="mt-8 text-left text-sm text-slate-400 space-y-3">
-                            <p>✅ Client ID & Secret 已就緒</p>
-                            <p class="text-amber-400">請由醫療系統環境啟動 (EHR Launch)</p>
+                            <p>✅ Client ID 已設定</p>
+                            <p>✅ Redirect URI 已修正</p>
+                            <p class="text-amber-400">請透過 SMART Launcher 或 EHR 系統啟動</p>
+                        </div>
+                        
+                        <div class="mt-6 pt-6 border-t border-slate-700 text-xs text-slate-500 font-mono">
+                            REDIRECT_URI: ${REDIRECT_URI}
                         </div>
                     </div>
                 `;
@@ -116,13 +143,12 @@
         </div>
 
         <div id="status" class="text-center py-16">
-            <i class="fa-solid fa-spinner fa-spin text-4xl text-blue-400"></i>
-            <p class="mt-6 text-slate-300">準備啟動 EHR Launch 流程...</p>
+            <!-- 由 JavaScript 動態替換 -->
         </div>
 
         <footer class="mt-16 text-center text-slate-600 text-xs">
             <p>© 2026 糖尿病共照網品質監測系統 | Powered by FHIR R4</p>
-            <p class="mt-2 font-mono text-[10px]">Client: cc344727... | Secret: 79f04b...</p>
+            <p class="mt-2 font-mono text-[10px]">Client ID: ${CLIENT_ID.slice(0,8)}...</p>
         </footer>
     </div>
 </body>
