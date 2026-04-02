@@ -18,6 +18,12 @@
             --amber-light: #fef3c7;
             --rose: #e11d48;
             --rose-light: #ffe4e6;
+            --blue: #2563eb;
+            --blue-light: #dbeafe;
+            --purple: #7c3aed;
+            --purple-light: #ede9fe;
+            --green: #16a34a;
+            --green-light: #dcfce7;
             --slate: #1e293b;
             --slate-mid: #334155;
             --slate-light: #64748b;
@@ -42,13 +48,10 @@
         /* ── 載入遮罩 ── */
         #loading-overlay {
             position: fixed; inset: 0;
-            background: rgba(255,255,255,0.95);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            gap: 16px;
+            background: rgba(255,255,255,0.96);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            z-index: 1000; gap: 16px;
         }
         .spinner {
             width: 40px; height: 40px;
@@ -60,89 +63,43 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         #loading-overlay p { color: var(--slate-light); font-size: 0.9rem; }
 
-        /* ── 版面 ── */
         .layout { display: flex; flex-direction: column; min-height: 100vh; }
 
         /* ── Header ── */
         header {
             background: var(--white);
             border-bottom: 1px solid var(--border);
-            padding: 0 32px;
-            height: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky; top: 0;
-            z-index: 100;
+            padding: 0 32px; height: 64px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 100;
             box-shadow: var(--shadow-sm);
         }
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .brand { display: flex; align-items: center; gap: 10px; }
         .brand-icon {
             width: 36px; height: 36px;
             background: linear-gradient(135deg, var(--teal), var(--teal-dark));
             border-radius: 9px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 16px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 16px;
         }
-        .brand-name {
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--slate);
-            letter-spacing: -0.01em;
-        }
-        .brand-en {
-            font-size: 0.7rem;
-            color: var(--slate-muted);
-            font-weight: 400;
-        }
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        .brand-name { font-size: 1rem; font-weight: 700; color: var(--slate); }
+        .brand-en { font-size: 0.7rem; color: var(--slate-muted); }
+        .header-right { display: flex; align-items: center; gap: 12px; }
         .auth-badge {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.78rem;
-            font-weight: 500;
-            background: var(--border);
-            color: var(--slate-light);
+            display: flex; align-items: center; gap: 6px;
+            padding: 5px 12px; border-radius: 20px;
+            font-size: 0.78rem; font-weight: 500;
+            background: var(--border); color: var(--slate-light);
         }
-        .auth-badge.verified {
-            background: var(--teal-light);
-            color: var(--teal-dark);
-        }
-        .auth-dot {
-            width: 6px; height: 6px;
-            border-radius: 50%;
-            background: currentColor;
-        }
-
-        /* 聯繫按鈕 */
+        .auth-badge.verified { background: var(--teal-light); color: var(--teal-dark); }
+        .auth-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
         .btn-contact {
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            display: flex; align-items: center; gap: 6px;
             padding: 7px 14px;
             background: transparent;
-            border: 1.5px solid var(--teal);
-            border-radius: 8px;
-            color: var(--teal-dark);
-            font-size: 0.82rem;
-            font-weight: 600;
-            font-family: inherit;
-            cursor: pointer;
-            transition: all 0.2s;
+            border: 1.5px solid var(--teal); border-radius: 8px;
+            color: var(--teal-dark); font-size: 0.82rem; font-weight: 600;
+            font-family: inherit; cursor: pointer; transition: all 0.2s;
         }
         .btn-contact:hover { background: var(--teal-pale); }
 
@@ -152,105 +109,70 @@
 
         /* ── 頁頭 ── */
         .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
+            display: flex; justify-content: space-between; align-items: flex-start;
             margin-bottom: 24px;
         }
-        .page-title {
-            font-size: 1.7rem;
-            font-weight: 700;
-            color: var(--slate);
-            letter-spacing: -0.02em;
-            margin-bottom: 4px;
-        }
-        .page-subtitle {
-            font-size: 0.85rem;
-            color: var(--slate-muted);
-        }
+        .page-title { font-size: 1.7rem; font-weight: 700; color: var(--slate); letter-spacing: -0.02em; margin-bottom: 4px; }
+        .page-subtitle { font-size: 0.85rem; color: var(--slate-muted); }
         .data-timestamp {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.8rem;
-            color: var(--slate-muted);
-            background: var(--white);
-            border: 1px solid var(--border);
-            padding: 6px 12px;
-            border-radius: 8px;
+            display: flex; align-items: center; gap: 6px;
+            font-size: 0.8rem; color: var(--slate-muted);
+            background: var(--white); border: 1px solid var(--border);
+            padding: 6px 12px; border-radius: 8px;
         }
 
         /* ── 病患卡 ── */
         .patient-card {
-            background: var(--white);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 20px 24px;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            box-shadow: var(--shadow-sm);
-            position: relative;
-            overflow: hidden;
+            background: var(--white); border: 1px solid var(--border);
+            border-radius: 14px; padding: 20px 24px; margin-bottom: 24px;
+            display: flex; align-items: center; gap: 16px;
+            box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
         }
         .patient-card::before {
-            content: '';
-            position: absolute;
-            left: 0; top: 0; bottom: 0;
-            width: 4px;
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
             background: linear-gradient(to bottom, var(--teal), var(--teal-dark));
         }
         .patient-avatar {
-            width: 52px; height: 52px;
-            background: var(--teal-light);
-            color: var(--teal-dark);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
-            flex-shrink: 0;
+            width: 52px; height: 52px; background: var(--teal-light); color: var(--teal-dark);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; flex-shrink: 0;
         }
-        .patient-name {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--slate);
-            margin-bottom: 3px;
-        }
-        .patient-meta {
-            font-size: 0.8rem;
-            color: var(--slate-muted);
-            display: flex;
-            gap: 12px;
-        }
+        .patient-name { font-size: 1.2rem; font-weight: 700; color: var(--slate); margin-bottom: 3px; }
+        .patient-meta { font-size: 0.8rem; color: var(--slate-muted); display: flex; gap: 12px; }
         .patient-meta span { display: flex; align-items: center; gap: 4px; }
         .patient-meta .tag {
-            background: var(--teal-light);
-            color: var(--teal-dark);
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-weight: 600;
+            background: var(--teal-light); color: var(--teal-dark);
+            padding: 2px 8px; border-radius: 4px; font-weight: 600;
         }
+
+        /* ── Section 標題 ── */
+        .section-header {
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 16px; margin-top: 32px;
+        }
+        .section-header:first-child { margin-top: 0; }
+        .section-icon {
+            width: 36px; height: 36px; border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+        }
+        .section-title { font-size: 1.1rem; font-weight: 700; color: var(--slate); }
+        .section-sub { font-size: 0.8rem; color: var(--slate-muted); margin-left: 2px; }
 
         /* ── 指標格線 ── */
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 24px;
+            gap: 20px; margin-bottom: 8px;
         }
 
         /* ── 指標卡 ── */
         .metric-card {
-            background: var(--white);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 24px;
+            background: var(--white); border: 1px solid var(--border);
+            border-radius: 14px; padding: 24px;
             box-shadow: var(--shadow-sm);
             transition: box-shadow 0.2s, transform 0.2s;
-            position: relative;
-            overflow: hidden;
+            position: relative; overflow: hidden;
             animation: fadeUp 0.5s ease both;
         }
         .metric-card:nth-child(1) { animation-delay: 0.1s; }
@@ -258,228 +180,252 @@
         .metric-card:nth-child(3) { animation-delay: 0.3s; }
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(16px); }
-            to { opacity: 1; transform: translateY(0); }
+            to   { opacity: 1; transform: translateY(0); }
         }
-        .metric-card:hover {
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-2px);
-        }
+        .metric-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+        .metric-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+        .metric-icon-wrap { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .metric-status-chip { font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.02em; }
+        .metric-title { font-size: 0.85rem; color: var(--slate-light); font-weight: 500; margin-bottom: 6px; }
+        .metric-value-row { display: flex; align-items: baseline; gap: 4px; margin-bottom: 16px; }
+        .metric-value { font-size: 3rem; font-weight: 700; line-height: 1; letter-spacing: -0.03em; }
+        .metric-unit { font-size: 1rem; color: var(--slate-light); font-weight: 400; }
+        .metric-target { font-size: 0.75rem; color: var(--slate-muted); margin-bottom: 10px; }
 
-        .metric-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 16px;
-        }
-        .metric-icon-wrap {
-            width: 40px; height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
-        .metric-status-chip {
-            font-size: 0.72rem;
-            font-weight: 700;
-            padding: 3px 10px;
-            border-radius: 20px;
-            letter-spacing: 0.02em;
-        }
+        .progress-track { height: 8px; background: var(--border); border-radius: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; border-radius: 20px; transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1); width: 0%; }
 
-        .metric-title {
-            font-size: 0.85rem;
-            color: var(--slate-light);
-            font-weight: 500;
-            margin-bottom: 6px;
-        }
-        .metric-value-row {
-            display: flex;
-            align-items: baseline;
-            gap: 4px;
-            margin-bottom: 16px;
-        }
-        .metric-value {
-            font-size: 3rem;
-            font-weight: 700;
-            line-height: 1;
-            letter-spacing: -0.03em;
-        }
-        .metric-unit {
-            font-size: 1rem;
-            color: var(--slate-light);
-            font-weight: 400;
-        }
-        .metric-target {
-            font-size: 0.75rem;
-            color: var(--slate-muted);
-            margin-bottom: 10px;
-        }
-
-        /* 進度條 */
-        .progress-track {
-            height: 8px;
-            background: var(--border);
-            border-radius: 20px;
-            overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%;
-            border-radius: 20px;
-            transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-            width: 0%;
-        }
-
-        /* 顏色主題 — 好 */
         .theme-good .metric-icon-wrap { background: var(--teal-light); color: var(--teal-dark); }
         .theme-good .metric-status-chip { background: var(--teal-light); color: var(--teal-dark); }
         .theme-good .metric-value { color: var(--teal-dark); }
         .theme-good .progress-fill { background: linear-gradient(90deg, var(--teal), var(--teal-dark)); }
 
-        /* 顏色主題 — 警告 */
         .theme-warn .metric-icon-wrap { background: var(--amber-light); color: var(--amber); }
         .theme-warn .metric-status-chip { background: var(--amber-light); color: var(--amber); }
         .theme-warn .metric-value { color: var(--amber); }
         .theme-warn .progress-fill { background: linear-gradient(90deg, #fbbf24, var(--amber)); }
 
-        /* 顏色主題 — 不佳 */
         .theme-bad .metric-icon-wrap { background: var(--rose-light); color: var(--rose); }
         .theme-bad .metric-status-chip { background: var(--rose-light); color: var(--rose); }
         .theme-bad .metric-value { color: var(--rose); }
         .theme-bad .progress-fill { background: linear-gradient(90deg, #fb7185, var(--rose)); }
 
-        /* ── 聯繫浮動面板 ── */
+        /* ══════════════════════════════
+           ── 衛教區 ──
+        ══════════════════════════════ */
+        .edu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px; margin-bottom: 8px;
+        }
+        .edu-card {
+            background: var(--white); border: 1px solid var(--border);
+            border-radius: 14px; padding: 20px;
+            box-shadow: var(--shadow-sm);
+            display: flex; flex-direction: column; gap: 12px;
+            transition: box-shadow 0.2s, transform 0.2s;
+            animation: fadeUp 0.5s ease both;
+            cursor: pointer;
+        }
+        .edu-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+        .edu-card-header { display: flex; align-items: flex-start; gap: 12px; }
+        .edu-badge {
+            width: 42px; height: 42px; border-radius: 11px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; flex-shrink: 0;
+        }
+        .edu-badge.blue { background: var(--blue-light); }
+        .edu-badge.green { background: var(--green-light); }
+        .edu-badge.amber { background: var(--amber-light); }
+        .edu-badge.purple { background: var(--purple-light); }
+        .edu-badge.teal { background: var(--teal-light); }
+        .edu-badge.rose { background: var(--rose-light); }
+        .edu-card-title { font-size: 0.95rem; font-weight: 700; color: var(--slate); margin-bottom: 2px; }
+        .edu-card-meta { font-size: 0.75rem; color: var(--slate-muted); }
+        .edu-card-body { font-size: 0.82rem; color: var(--slate-light); line-height: 1.65; }
+        .edu-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+        .edu-tag {
+            font-size: 0.7rem; font-weight: 600; padding: 2px 8px;
+            border-radius: 20px; background: var(--surface); color: var(--slate-light);
+            border: 1px solid var(--border);
+        }
+        .edu-action {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-top: auto; padding-top: 4px;
+        }
+        .edu-link {
+            font-size: 0.78rem; font-weight: 600; color: var(--teal-dark);
+            display: flex; align-items: center; gap: 4px;
+        }
+        .edu-progress-bar {
+            height: 4px; background: var(--border); border-radius: 20px;
+            overflow: hidden; margin-top: 4px;
+        }
+        .edu-progress-fill { height: 100%; border-radius: 20px; transition: width 1s ease 0.3s; width: 0; }
+
+        /* 衛教完成度摘要 */
+        .edu-summary {
+            background: linear-gradient(135deg, var(--teal-pale), #f0fdf4);
+            border: 1px solid var(--teal-light);
+            border-radius: 14px; padding: 18px 22px;
+            display: flex; align-items: center; gap: 16px;
+            margin-bottom: 16px;
+        }
+        .edu-summary-icon { font-size: 2rem; }
+        .edu-summary-text { flex: 1; }
+        .edu-summary-title { font-size: 0.9rem; font-weight: 700; color: var(--teal-dark); margin-bottom: 2px; }
+        .edu-summary-sub { font-size: 0.78rem; color: var(--slate-light); }
+        .edu-summary-stat { font-size: 1.6rem; font-weight: 700; color: var(--teal-dark); }
+
+        /* ══════════════════════════════
+           ── 檢查區 ──
+        ══════════════════════════════ */
+        .exam-layout {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 20px;
+            margin-bottom: 8px;
+        }
+        @media (max-width: 900px) { .exam-layout { grid-template-columns: 1fr; } }
+
+        /* 檢查時程表 */
+        .exam-schedule {
+            background: var(--white); border: 1px solid var(--border);
+            border-radius: 14px; padding: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+        .exam-schedule-title { font-size: 0.9rem; font-weight: 700; color: var(--slate); margin-bottom: 18px; }
+        .exam-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px 0; border-bottom: 1px solid var(--border);
+        }
+        .exam-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .exam-status-dot {
+            width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+        }
+        .dot-done   { background: var(--teal); }
+        .dot-soon   { background: var(--amber); }
+        .dot-due    { background: var(--rose); box-shadow: 0 0 0 3px var(--rose-light); }
+        .dot-future { background: var(--border); }
+
+        .exam-name { font-size: 0.88rem; font-weight: 600; color: var(--slate); }
+        .exam-date { font-size: 0.76rem; color: var(--slate-muted); margin-top: 1px; }
+        .exam-right { margin-left: auto; }
+        .exam-chip {
+            font-size: 0.7rem; font-weight: 700; padding: 3px 9px; border-radius: 20px;
+        }
+        .chip-done   { background: var(--teal-light);  color: var(--teal-dark); }
+        .chip-soon   { background: var(--amber-light);  color: var(--amber); }
+        .chip-due    { background: var(--rose-light);   color: var(--rose); }
+        .chip-future { background: var(--surface);      color: var(--slate-muted); border: 1px solid var(--border); }
+
+        /* 檢查結果卡 */
+        .exam-results-col { display: flex; flex-direction: column; gap: 16px; }
+
+        .result-card {
+            background: var(--white); border: 1px solid var(--border);
+            border-radius: 14px; padding: 18px 20px;
+            box-shadow: var(--shadow-sm);
+        }
+        .result-card-title { font-size: 0.78rem; font-weight: 700; color: var(--slate-light); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 12px; }
+        .result-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 8px 0; border-bottom: 1px solid var(--border);
+            font-size: 0.85rem;
+        }
+        .result-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .result-label { color: var(--slate-light); }
+        .result-val { font-weight: 700; color: var(--slate); }
+        .result-val.ok  { color: var(--teal-dark); }
+        .result-val.warn { color: var(--amber); }
+        .result-val.bad  { color: var(--rose); }
+        .result-ref { font-size: 0.71rem; color: var(--slate-muted); }
+
+        /* 下次回診提醒 */
+        .next-visit {
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            border: 1px solid #bfdbfe;
+            border-radius: 14px; padding: 18px 20px;
+            display: flex; align-items: center; gap: 14px;
+        }
+        .next-visit-icon { font-size: 2rem; }
+        .next-visit-label { font-size: 0.78rem; color: var(--blue); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+        .next-visit-date { font-size: 1.1rem; font-weight: 700; color: var(--blue); }
+        .next-visit-sub { font-size: 0.75rem; color: var(--slate-muted); margin-top: 1px; }
+
+        /* ── 聯繫浮層 ── */
         .overlay-bg {
-            display: none;
-            position: fixed; inset: 0;
-            background: rgba(15,23,42,0.4);
-            z-index: 500;
+            display: none; position: fixed; inset: 0;
+            background: rgba(15,23,42,0.4); z-index: 500;
             backdrop-filter: blur(2px);
         }
         .overlay-bg.open { display: block; }
-
         .contact-drawer {
-            position: fixed;
-            top: 50%; right: 50%;
+            position: fixed; top: 50%; right: 50%;
             transform: translate(50%, -50%) scale(0.96);
-            opacity: 0;
-            pointer-events: none;
-            z-index: 600;
-            background: var(--white);
-            border-radius: 20px;
-            box-shadow: var(--shadow-lg);
-            width: 90%;
-            max-width: 480px;
-            padding: 32px;
+            opacity: 0; pointer-events: none;
+            z-index: 600; background: var(--white);
+            border-radius: 20px; box-shadow: var(--shadow-lg);
+            width: 90%; max-width: 480px; padding: 32px;
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            max-height: 90vh;
-            overflow-y: auto;
+            max-height: 90vh; overflow-y: auto;
         }
-        .contact-drawer.open {
-            opacity: 1;
-            pointer-events: auto;
-            transform: translate(50%, -50%) scale(1);
-        }
-        .drawer-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-        }
-        .drawer-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--slate);
-        }
+        .contact-drawer.open { opacity: 1; pointer-events: auto; transform: translate(50%, -50%) scale(1); }
+        .drawer-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .drawer-title { font-size: 1.2rem; font-weight: 700; color: var(--slate); }
         .drawer-close {
-            width: 32px; height: 32px;
-            border: none; background: var(--surface);
-            border-radius: 8px; cursor: pointer;
-            font-size: 16px; color: var(--slate-light);
+            width: 32px; height: 32px; border: none; background: var(--surface);
+            border-radius: 8px; cursor: pointer; font-size: 16px; color: var(--slate-light);
             transition: background 0.2s;
         }
         .drawer-close:hover { background: var(--border); }
-        .drawer-desc {
-            font-size: 0.85rem;
-            color: var(--slate-muted);
-            margin-bottom: 24px;
-        }
+        .drawer-desc { font-size: 0.85rem; color: var(--slate-muted); margin-bottom: 24px; }
         .form-group { margin-bottom: 14px; }
-        .form-group label {
-            display: block;
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--slate-light);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 5px;
-        }
+        .form-group label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--slate-light); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
         .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1.5px solid var(--border);
-            border-radius: 9px;
-            font-family: inherit;
-            font-size: 0.9rem;
-            color: var(--slate);
-            background: var(--white);
-            transition: border-color 0.2s, box-shadow 0.2s;
-            outline: none;
+            width: 100%; padding: 10px 12px;
+            border: 1.5px solid var(--border); border-radius: 9px;
+            font-family: inherit; font-size: 0.9rem; color: var(--slate);
+            background: var(--white); transition: border-color 0.2s, box-shadow 0.2s; outline: none;
         }
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-            border-color: var(--teal);
-            box-shadow: 0 0 0 3px rgba(13,148,136,0.1);
+            border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,0.1);
         }
         .form-group textarea { resize: none; height: 72px; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .btn-submit-main {
-            width: 100%;
-            padding: 12px;
+            width: 100%; padding: 12px;
             background: linear-gradient(135deg, var(--teal), var(--teal-dark));
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            font-family: inherit;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(13,148,136,0.3);
-            transition: all 0.2s;
-            margin-top: 8px;
+            color: white; border: none; border-radius: 10px;
+            font-size: 0.95rem; font-weight: 600; font-family: inherit; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(13,148,136,0.3); transition: all 0.2s; margin-top: 8px;
         }
-        .btn-submit-main:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(13,148,136,0.4);
-        }
+        .btn-submit-main:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(13,148,136,0.4); }
 
-        /* 送出成功 toast */
+        /* Toast */
         .toast {
-            position: fixed;
-            bottom: 32px; left: 50%;
+            position: fixed; bottom: 32px; left: 50%;
             transform: translateX(-50%) translateY(80px);
-            background: var(--slate);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 10px;
-            font-size: 0.88rem;
-            font-weight: 500;
-            z-index: 1000;
-            opacity: 0;
+            background: var(--slate); color: white;
+            padding: 12px 20px; border-radius: 10px;
+            font-size: 0.88rem; font-weight: 500;
+            z-index: 1000; opacity: 0;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             white-space: nowrap;
         }
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-        /* ── Footer ── */
+        /* Footer */
         footer {
             border-top: 1px solid var(--border);
-            padding: 16px 32px;
-            text-align: center;
-            font-size: 0.75rem;
-            color: var(--slate-muted);
+            padding: 16px 32px; text-align: center;
+            font-size: 0.75rem; color: var(--slate-muted);
+        }
+
+        /* Divider */
+        .section-divider {
+            height: 1px; background: var(--border);
+            margin: 36px 0;
         }
     </style>
 </head>
@@ -502,9 +448,7 @@
             </div>
         </div>
         <div class="header-right">
-            <button class="btn-contact" onclick="openContact()">
-                📅 預約測試時間
-            </button>
+            <button class="btn-contact" onclick="openContact()">📅 預約測試時間</button>
             <div id="auth-status" class="auth-badge">
                 <span class="auth-dot"></span>驗證中
             </div>
@@ -512,9 +456,9 @@
         </div>
     </header>
 
-    <!-- 主內容 -->
     <main>
         <div class="container">
+
             <!-- 頁面標題 -->
             <div class="page-header">
                 <div>
@@ -529,9 +473,7 @@
 
             <!-- 病患卡 -->
             <div class="patient-card">
-                <div class="patient-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
+                <div class="patient-avatar"><i class="fas fa-user"></i></div>
                 <div>
                     <div class="patient-name" id="patient-name">讀取中...</div>
                     <div class="patient-meta">
@@ -541,15 +483,20 @@
                 </div>
             </div>
 
-            <!-- 指標卡格線 -->
-            <div class="metrics-grid">
+            <!-- ══ 品質指標 ══ -->
+            <div class="section-header">
+                <div class="section-icon" style="background:var(--teal-light); color:var(--teal-dark);">📊</div>
+                <div>
+                    <div class="section-title">品質指標</div>
+                    <div class="section-sub">Quality Indicators</div>
+                </div>
+            </div>
 
+            <div class="metrics-grid">
                 <!-- HbA1c -->
                 <div class="metric-card theme-good">
                     <div class="metric-header">
-                        <div class="metric-icon-wrap">
-                            <i class="fas fa-vial"></i>
-                        </div>
+                        <div class="metric-icon-wrap"><i class="fas fa-vial"></i></div>
                         <div class="metric-status-chip">達標</div>
                     </div>
                     <div class="metric-title">糖化血色素 (HbA1c) 檢驗率</div>
@@ -558,17 +505,13 @@
                         <div class="metric-unit">%</div>
                     </div>
                     <div class="metric-target">目標值：≥ 90%</div>
-                    <div class="progress-track">
-                        <div class="progress-fill" id="hba1c-bar"></div>
-                    </div>
+                    <div class="progress-track"><div class="progress-fill" id="hba1c-bar"></div></div>
                 </div>
 
-                <!-- 眼底檢查 -->
+                <!-- 眼底 -->
                 <div class="metric-card theme-warn">
                     <div class="metric-header">
-                        <div class="metric-icon-wrap">
-                            <i class="fas fa-eye"></i>
-                        </div>
+                        <div class="metric-icon-wrap"><i class="fas fa-eye"></i></div>
                         <div class="metric-status-chip">待改善</div>
                     </div>
                     <div class="metric-title">眼底檢查或眼底攝影率</div>
@@ -577,17 +520,13 @@
                         <div class="metric-unit">%</div>
                     </div>
                     <div class="metric-target">目標值：≥ 90%</div>
-                    <div class="progress-track">
-                        <div class="progress-fill" id="eye-bar"></div>
-                    </div>
+                    <div class="progress-track"><div class="progress-fill" id="eye-bar"></div></div>
                 </div>
 
                 <!-- ACR -->
                 <div class="metric-card theme-bad">
                     <div class="metric-header">
-                        <div class="metric-icon-wrap">
-                            <i class="fas fa-prescription-bottle"></i>
-                        </div>
+                        <div class="metric-icon-wrap"><i class="fas fa-prescription-bottle"></i></div>
                         <div class="metric-status-chip">需注意</div>
                     </div>
                     <div class="metric-title">尿液微量白蛋白檢查率 (ACR)</div>
@@ -596,12 +535,324 @@
                         <div class="metric-unit">%</div>
                     </div>
                     <div class="metric-target">目標值：≥ 80%</div>
-                    <div class="progress-track">
-                        <div class="progress-fill" id="acr-bar"></div>
+                    <div class="progress-track"><div class="progress-fill" id="acr-bar"></div></div>
+                </div>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <!-- ══ 衛教區 ══ -->
+            <div class="section-header">
+                <div class="section-icon" style="background:var(--blue-light); color:var(--blue);">📚</div>
+                <div>
+                    <div class="section-title">衛教資源</div>
+                    <div class="section-sub">Patient Education</div>
+                </div>
+            </div>
+
+            <!-- 衛教完成度摘要 -->
+            <div class="edu-summary">
+                <div class="edu-summary-icon">🎓</div>
+                <div class="edu-summary-text">
+                    <div class="edu-summary-title">本季衛教完成進度</div>
+                    <div class="edu-summary-sub">已完成 3 / 6 項必修衛教，建議優先補齊足部護理與低血糖處置</div>
+                </div>
+                <div class="edu-summary-stat">50%</div>
+            </div>
+
+            <div class="edu-grid">
+                <!-- 飲食管理 -->
+                <div class="edu-card" onclick="showEduToast('飲食管理')">
+                    <div class="edu-card-header">
+                        <div class="edu-badge blue">🥗</div>
+                        <div>
+                            <div class="edu-card-title">飲食管理與醣份計算</div>
+                            <div class="edu-card-meta">必修 · 已完成</div>
+                        </div>
+                    </div>
+                    <div class="edu-card-body">學習均衡飲食原則、醣份計算方法及低 GI 食物選擇，有效控制餐後血糖。</div>
+                    <div class="edu-tags">
+                        <span class="edu-tag">飲食</span>
+                        <span class="edu-tag">醣份</span>
+                        <span class="edu-tag">GI 值</span>
+                    </div>
+                    <div>
+                        <div class="edu-progress-bar"><div class="edu-progress-fill" style="background:var(--blue); width:100%;"></div></div>
+                    </div>
+                    <div class="edu-action">
+                        <div class="edu-link"><i class="fas fa-check-circle" style="color:var(--teal);"></i> 已完成</div>
+                        <div style="font-size:0.72rem; color:var(--slate-muted);">2025/01/15</div>
                     </div>
                 </div>
 
-            </div><!-- /metrics-grid -->
+                <!-- 血糖監測 -->
+                <div class="edu-card" onclick="showEduToast('血糖監測')">
+                    <div class="edu-card-header">
+                        <div class="edu-badge green">🩸</div>
+                        <div>
+                            <div class="edu-card-title">自我血糖監測技巧</div>
+                            <div class="edu-card-meta">必修 · 已完成</div>
+                        </div>
+                    </div>
+                    <div class="edu-card-body">正確使用血糖機、記錄血糖日誌，並了解各時段血糖目標範圍與異常處置。</div>
+                    <div class="edu-tags">
+                        <span class="edu-tag">血糖機</span>
+                        <span class="edu-tag">自我監測</span>
+                    </div>
+                    <div>
+                        <div class="edu-progress-bar"><div class="edu-progress-fill" style="background:var(--green); width:100%;"></div></div>
+                    </div>
+                    <div class="edu-action">
+                        <div class="edu-link"><i class="fas fa-check-circle" style="color:var(--teal);"></i> 已完成</div>
+                        <div style="font-size:0.72rem; color:var(--slate-muted);">2025/02/08</div>
+                    </div>
+                </div>
+
+                <!-- 藥物衛教 -->
+                <div class="edu-card" onclick="showEduToast('藥物管理')">
+                    <div class="edu-card-header">
+                        <div class="edu-badge teal">💊</div>
+                        <div>
+                            <div class="edu-card-title">藥物管理與胰島素注射</div>
+                            <div class="edu-card-meta">必修 · 已完成</div>
+                        </div>
+                    </div>
+                    <div class="edu-card-body">口服藥物機轉、胰島素注射部位輪替、保存方法及忘記服藥的處理原則。</div>
+                    <div class="edu-tags">
+                        <span class="edu-tag">口服藥</span>
+                        <span class="edu-tag">胰島素</span>
+                        <span class="edu-tag">注射</span>
+                    </div>
+                    <div>
+                        <div class="edu-progress-bar"><div class="edu-progress-fill" style="background:var(--teal); width:100%;"></div></div>
+                    </div>
+                    <div class="edu-action">
+                        <div class="edu-link"><i class="fas fa-check-circle" style="color:var(--teal);"></i> 已完成</div>
+                        <div style="font-size:0.72rem; color:var(--slate-muted);">2025/02/20</div>
+                    </div>
+                </div>
+
+                <!-- 足部護理 -->
+                <div class="edu-card" onclick="showEduToast('足部護理')">
+                    <div class="edu-card-header">
+                        <div class="edu-badge amber">🦶</div>
+                        <div>
+                            <div class="edu-card-title">足部護理與傷口預防</div>
+                            <div class="edu-card-meta">必修 · <span style="color:var(--rose); font-weight:700;">未完成</span></div>
+                        </div>
+                    </div>
+                    <div class="edu-card-body">每日足部檢查方法、正確修剪趾甲、選擇適合的鞋款，預防糖尿病足潰瘍。</div>
+                    <div class="edu-tags">
+                        <span class="edu-tag">足部</span>
+                        <span class="edu-tag">傷口照護</span>
+                        <span class="edu-tag">預防</span>
+                    </div>
+                    <div>
+                        <div class="edu-progress-bar"><div class="edu-progress-fill" style="background:var(--amber); width:30%;"></div></div>
+                    </div>
+                    <div class="edu-action">
+                        <div class="edu-link" style="color:var(--amber);">▶ 繼續學習 <i class="fas fa-arrow-right"></i></div>
+                        <div style="font-size:0.72rem; color:var(--slate-muted);">進度 30%</div>
+                    </div>
+                </div>
+
+                <!-- 低血糖 -->
+                <div class="edu-card" onclick="showEduToast('低血糖處置')">
+                    <div class="edu-card-header">
+                        <div class="edu-badge rose">⚠️</div>
+                        <div>
+                            <div class="edu-card-title">低血糖辨識與緊急處置</div>
+                            <div class="edu-card-meta">必修 · <span style="color:var(--rose); font-weight:700;">未完成</span></div>
+                        </div>
+                    </div>
+                    <div class="edu-card-body">認識低血糖症狀、15-15 法則、隨身備糖的重要性，以及告知親友的應對方式。</div>
+                    <div class="edu-tags">
+                        <span class="edu-tag">低血糖</span>
+                        <span class="edu-tag">急救</span>
+                        <span class="edu-tag">15-15</span>
+                    </div>
+                    <div>
+                        <div class="edu-progress-bar"><div class="edu-progress-fill" style="background:var(--rose); width:0%;"></div></div>
+                    </div>
+                    <div class="edu-action">
+                        <div class="edu-link" style="color:var(--rose);">▶ 開始學習 <i class="fas fa-arrow-right"></i></div>
+                        <div style="font-size:0.72rem; color:var(--slate-muted);">尚未開始</div>
+                    </div>
+                </div>
+
+                <!-- 運動衛教 -->
+                <div class="edu-card" onclick="showEduToast('運動計畫')">
+                    <div class="edu-card-header">
+                        <div class="edu-badge purple">🏃</div>
+                        <div>
+                            <div class="edu-card-title">運動計畫與血糖調節</div>
+                            <div class="edu-card-meta">選修 · <span style="color:var(--rose); font-weight:700;">未完成</span></div>
+                        </div>
+                    </div>
+                    <div class="edu-card-body">有氧與阻力訓練對血糖的影響、運動前後血糖監測，以及適合糖尿病患的運動種類。</div>
+                    <div class="edu-tags">
+                        <span class="edu-tag">有氧</span>
+                        <span class="edu-tag">阻力訓練</span>
+                        <span class="edu-tag">生活型態</span>
+                    </div>
+                    <div>
+                        <div class="edu-progress-bar"><div class="edu-progress-fill" style="background:var(--purple); width:0%;"></div></div>
+                    </div>
+                    <div class="edu-action">
+                        <div class="edu-link" style="color:var(--purple);">▶ 開始學習 <i class="fas fa-arrow-right"></i></div>
+                        <div style="font-size:0.72rem; color:var(--slate-muted);">尚未開始</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <!-- ══ 檢查區 ══ -->
+            <div class="section-header">
+                <div class="section-icon" style="background:var(--amber-light); color:var(--amber);">🔬</div>
+                <div>
+                    <div class="section-title">定期檢查追蹤</div>
+                    <div class="section-sub">Examination Tracking</div>
+                </div>
+            </div>
+
+            <div class="exam-layout">
+                <!-- 左：檢查時程表 -->
+                <div class="exam-schedule">
+                    <div class="exam-schedule-title">年度必要檢查項目</div>
+
+                    <div class="exam-item">
+                        <div class="exam-status-dot dot-done"></div>
+                        <div>
+                            <div class="exam-name">HbA1c 糖化血色素</div>
+                            <div class="exam-date">上次：2025/03/10 ・ 結果：7.2%</div>
+                        </div>
+                        <div class="exam-right"><span class="exam-chip chip-done">已完成</span></div>
+                    </div>
+
+                    <div class="exam-item">
+                        <div class="exam-status-dot dot-done"></div>
+                        <div>
+                            <div class="exam-name">空腹血脂四項</div>
+                            <div class="exam-date">上次：2025/01/20 ・ LDL：98 mg/dL</div>
+                        </div>
+                        <div class="exam-right"><span class="exam-chip chip-done">已完成</span></div>
+                    </div>
+
+                    <div class="exam-item">
+                        <div class="exam-status-dot dot-done"></div>
+                        <div>
+                            <div class="exam-name">腎功能 (Cr, eGFR)</div>
+                            <div class="exam-date">上次：2025/02/14 ・ eGFR：72</div>
+                        </div>
+                        <div class="exam-right"><span class="exam-chip chip-done">已完成</span></div>
+                    </div>
+
+                    <div class="exam-item">
+                        <div class="exam-status-dot dot-soon"></div>
+                        <div>
+                            <div class="exam-name">尿液微量白蛋白 (ACR)</div>
+                            <div class="exam-date">預計：2025/06/01 ・ 距今 60 天</div>
+                        </div>
+                        <div class="exam-right"><span class="exam-chip chip-soon">即將到期</span></div>
+                    </div>
+
+                    <div class="exam-item">
+                        <div class="exam-status-dot dot-due"></div>
+                        <div>
+                            <div class="exam-name">眼底攝影</div>
+                            <div class="exam-date">上次：2024/04/05 ・ 已逾期 30 天</div>
+                        </div>
+                        <div class="exam-right"><span class="exam-chip chip-due">逾期未檢</span></div>
+                    </div>
+
+                    <div class="exam-item">
+                        <div class="exam-status-dot dot-due"></div>
+                        <div>
+                            <div class="exam-name">足部神經及血管評估</div>
+                            <div class="exam-date">上次：2024/05/18 ・ 建議每年一次</div>
+                        </div>
+                        <div class="exam-right"><span class="exam-chip chip-due">逾期未檢</span></div>
+                    </div>
+
+                    <div class="exam-item">
+                        <div class="exam-status-dot dot-future"></div>
+                        <div>
+                            <div class="exam-name">心電圖 (ECG)</div>
+                            <div class="exam-date">預計：2025/09/01 ・ 距今 153 天</div>
+                        </div>
+                        <div class="exam-right"><span class="exam-chip chip-future">排程中</span></div>
+                    </div>
+
+                    <div class="exam-item">
+                        <div class="exam-status-dot dot-future"></div>
+                        <div>
+                            <div class="exam-name">牙科檢查</div>
+                            <div class="exam-date">預計：2025/08/15 ・ 每半年一次</div>
+                        </div>
+                        <div class="exam-right"><span class="exam-chip chip-future">排程中</span></div>
+                    </div>
+                </div>
+
+                <!-- 右：最新數值 + 下次回診 -->
+                <div class="exam-results-col">
+                    <div class="result-card">
+                        <div class="result-card-title">最新檢驗數值</div>
+                        <div class="result-row">
+                            <span class="result-label">HbA1c</span>
+                            <div style="text-align:right;">
+                                <div class="result-val ok">7.2%</div>
+                                <div class="result-ref">目標 &lt; 7.5%</div>
+                            </div>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">空腹血糖</span>
+                            <div style="text-align:right;">
+                                <div class="result-val ok">118 mg/dL</div>
+                                <div class="result-ref">目標 80–130</div>
+                            </div>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">LDL 膽固醇</span>
+                            <div style="text-align:right;">
+                                <div class="result-val ok">98 mg/dL</div>
+                                <div class="result-ref">目標 &lt; 100</div>
+                            </div>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">收縮壓</span>
+                            <div style="text-align:right;">
+                                <div class="result-val warn">138 mmHg</div>
+                                <div class="result-ref">目標 &lt; 130</div>
+                            </div>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">eGFR</span>
+                            <div style="text-align:right;">
+                                <div class="result-val ok">72 mL/min</div>
+                                <div class="result-ref">CKD G2</div>
+                            </div>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">BMI</span>
+                            <div style="text-align:right;">
+                                <div class="result-val warn">26.8</div>
+                                <div class="result-ref">目標 18.5–24</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="next-visit">
+                        <div class="next-visit-icon">📅</div>
+                        <div>
+                            <div class="next-visit-label">下次回診</div>
+                            <div class="next-visit-date">2025 年 6 月 3 日</div>
+                            <div class="next-visit-sub">內分泌科門診・距今 62 天・請記得空腹抽血</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </main>
 
@@ -610,17 +861,14 @@
     </footer>
 </div>
 
-<!-- 聯繫浮層背景 -->
+<!-- 聯繫浮層 -->
 <div class="overlay-bg" id="overlay-bg" onclick="closeContact()"></div>
-
-<!-- 聯繫面板 -->
 <div class="contact-drawer" id="contact-drawer">
     <div class="drawer-header">
         <div class="drawer-title">📅 預約系統測試時間</div>
         <button class="drawer-close" onclick="closeContact()">✕</button>
     </div>
     <div class="drawer-desc">填寫下方資料後，我們將在 1–2 個工作天內與您聯繫，確認測試細節。</div>
-
     <div class="form-group">
         <label>機構 / 診所名稱</label>
         <input type="text" id="d-org" placeholder="例：大安醫療診所">
@@ -661,11 +909,9 @@
     <button class="btn-submit-main" onclick="submitContact()">✉️ 送出預約申請</button>
 </div>
 
-<!-- Toast 通知 -->
 <div class="toast" id="toast"></div>
 
 <script>
-    // 日期設定
     document.getElementById('data-date').innerText = new Date().toLocaleDateString('zh-TW');
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('d-date').min = today;
@@ -679,7 +925,6 @@
             badge.innerHTML = '<span class="auth-dot"></span>OAuth 驗證成功';
             badge.classList.add('verified');
 
-            // 讀取病患資料
             client.patient.read().then(patient => {
                 let name = "未知病患";
                 if (patient.name && patient.name.length > 0) {
@@ -692,7 +937,6 @@
                 document.getElementById('patient-name').innerText = "無法讀取病患資料";
             });
 
-            // 模擬共照網品質數據（實際應呼叫 Observation / MeasureReport）
             setTimeout(() => {
                 animateValue('hba1c-val', 0, 92, 1000);
                 animateValue('eye-val', 0, 85, 1000);
@@ -706,7 +950,7 @@
         })
         .catch(error => {
             document.getElementById('loading-overlay').innerHTML = `
-                <div style="text-align:center; padding: 20px;">
+                <div style="text-align:center; padding:20px;">
                     <div style="font-size:2.5rem; margin-bottom:12px;">⚠️</div>
                     <h3 style="color:#e11d48; margin-bottom:8px;">OAuth 驗證失敗</h3>
                     <p style="color:#64748b; font-size:0.9rem;">${error.message}</p>
@@ -714,13 +958,10 @@
                         style="margin-top:20px; padding:10px 24px; background:#0d9488; color:white; border:none; border-radius:8px; font-size:0.9rem; cursor:pointer; font-family:inherit;">
                         返回授權頁面
                     </button>
-                </div>
-            `;
+                </div>`;
         });
 
-    // ── 數字跑馬燈 ──
     function animateValue(id, start, end, duration) {
-        if (start === end) return;
         let current = start;
         const range = end - start;
         const stepTime = Math.abs(Math.floor(duration / range));
@@ -732,7 +973,6 @@
         }, stepTime);
     }
 
-    // ── 聯繫面板 ──
     function openContact() {
         document.getElementById('overlay-bg').classList.add('open');
         document.getElementById('contact-drawer').classList.add('open');
@@ -745,19 +985,15 @@
         const name  = document.getElementById('d-name').value.trim();
         const phone = document.getElementById('d-phone').value.trim();
         const email = document.getElementById('d-email').value.trim();
-        if (!name || !phone || !email) {
-            showToast('⚠️ 請填寫聯絡人姓名、電話及電子郵件');
-            return;
-        }
+        if (!name || !phone || !email) { showToast('⚠️ 請填寫聯絡人姓名、電話及電子郵件'); return; }
         const payload = {
-            org:   document.getElementById('d-org').value.trim(),
+            org: document.getElementById('d-org').value.trim(),
             name, phone, email,
-            date:  document.getElementById('d-date').value,
-            time:  document.getElementById('d-time').value,
-            note:  document.getElementById('d-note').value
+            date: document.getElementById('d-date').value,
+            time: document.getElementById('d-time').value,
+            note: document.getElementById('d-note').value
         };
         console.log('預約申請：', payload);
-        // 實際環境：fetch('/api/contact', { method: 'POST', body: JSON.stringify(payload) })
         closeContact();
         showToast('✅ 申請送出！我們將在 1–2 個工作天內聯繫您。');
     }
@@ -766,6 +1002,9 @@
         t.textContent = msg;
         t.classList.add('show');
         setTimeout(() => t.classList.remove('show'), 4000);
+    }
+    function showEduToast(topic) {
+        showToast(`📖 開啟「${topic}」衛教內容...`);
     }
 </script>
 </body>
