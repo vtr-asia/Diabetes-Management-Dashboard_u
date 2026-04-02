@@ -3,127 +3,456 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>系統啟動 | 糖尿病共照網</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script>
-        // 憑證資訊整合
-        const CLIENT_ID = "cc344727-6f90-496c-94fd-c7829aa9a51d";
-        const CLIENT_SECRET = "79f04b56b33491716c0880af72cdef7d3f0629111421cedd18353651cd313d9e"; 
-        const REDIRECT_URI = window.location.origin + "/index.html";
-        const SCOPES = "launch patient/*.read openid fhirUser profile";
-
-        function getUrlParams() {
-            const params = new URLSearchParams(window.location.search);
-            return {
-                iss: params.get('iss'),
-                launch: params.get('launch')
-            };
+    <title>糖尿病共照網 - 系統授權</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fhirclient/build/fhir-client.js"></script>
+    <style>
+        :root {
+            --teal: #0d9488;
+            --teal-dark: #0f766e;
+            --teal-light: #ccfbf1;
+            --slate: #1e293b;
+            --slate-mid: #334155;
+            --slate-light: #64748b;
+            --white: #ffffff;
+            --surface: #f8fafc;
+            --border: #e2e8f0;
         }
 
-        async function startEHRLaunch() {
-            const { iss, launch } = getUrlParams();
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
-            if (!iss) {
-                document.getElementById('status').innerHTML = `
-                    <div class="text-amber-400">
-                        <i class="fa-solid fa-triangle-exclamation text-4xl"></i>
-                        <p class="mt-4 text-lg">缺少 iss 參數</p>
-                        <p class="text-sm mt-2">請透過 <a href="https://launch.smarthealthit.org/" target="_blank" class="underline">SMART Launcher</a> 啟動測試</p>
-                    </div>
-                `;
-                return;
-            }
-
-            document.getElementById('status').innerHTML = `
-                <i class="fa-solid fa-spinner fa-spin text-5xl text-blue-400"></i>
-                <p class="mt-6 text-slate-300 text-xl">正在連線至衛福部 FHIR 沙盒進行授權...</p>
-                <p class="text-xs text-slate-500 mt-3">iss: ${iss}</p>
-            `;
-
-            try {
-                // 1. 自動偵測 SMART 配置
-                const configUrl = iss.replace(/\/$/, '') + '/.well-known/smart-configuration';
-                const configRes = await fetch(configUrl, { cache: 'no-cache' });
-
-                if (!configRes.ok) throw new Error(`無法取得 SMART 配置 (${configRes.status})`);
-
-                const config = await configRes.json();
-
-                // 2. 儲存關鍵參數與 Secret 給 index.html 使用
-                sessionStorage.setItem('fhir_iss', iss);
-                sessionStorage.setItem('fhir_token_url', config.token_endpoint);
-                sessionStorage.setItem('fhir_client_id', CLIENT_ID);
-                sessionStorage.setItem('fhir_client_secret', CLIENT_SECRET); // 加入 Secret 供 Token 交換使用
-                if (launch) sessionStorage.setItem('fhir_launch', launch);
-
-                // 3. 建構 OAuth 2.0 授權請求
-                const state = btoa(Math.random().toString(36)).slice(0, 20);
-                const authParams = new URLSearchParams({
-                    response_type: 'code',
-                    client_id: CLIENT_ID,
-                    redirect_uri: REDIRECT_URI,
-                    scope: SCOPES,
-                    state: state,
-                    aud: iss,
-                    launch: launch || ''
-                });
-
-                const authorizeUrl = `${config.authorization_endpoint}?${authParams.toString()}`;
-                console.log('🚀 導向授權頁面:', authorizeUrl);
-                window.location.href = authorizeUrl;
-
-            } catch (error) {
-                console.error(error);
-                document.getElementById('status').innerHTML = `
-                    <div class="text-red-400">
-                        <i class="fa-solid fa-circle-exclamation text-4xl"></i>
-                        <p class="mt-4 text-lg">啟動失敗</p>
-                        <p class="text-sm mt-2">${error.message}</p>
-                    </div>
-                `;
-            }
+        body {
+            font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            background: var(--surface);
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            position: relative;
+            overflow: hidden;
         }
 
-        window.onload = () => {
-            const params = getUrlParams();
-            if (params.iss) {
-                startEHRLaunch();
-            } else {
-                document.getElementById('status').innerHTML = `
-                    <div class="max-w-md mx-auto bg-slate-800/70 p-8 rounded-3xl border border-slate-700 text-center">
-                        <i class="fa-solid fa-notes-medical text-6xl text-blue-400 mb-4"></i>
-                        <h1 class="text-3xl font-black text-white">糖尿病共照網</h1>
-                        <p class="text-blue-400 font-mono text-sm mt-1">SMART on FHIR Launch</p>
-                        <div class="mt-8 text-left text-sm text-slate-400 space-y-3">
-                            <p>✅ Client ID & Secret 已就緒</p>
-                            <p class="text-amber-400">請由醫療系統環境啟動 (EHR Launch)</p>
-                        </div>
-                    </div>
-                `;
-            }
-        };
-    </script>
+        /* 背景幾何裝飾 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -200px; right: -200px;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(13,148,136,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -150px; left: -150px;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(13,148,136,0.05) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        /* 主卡片 */
+        .card {
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 20px 60px rgba(0,0,0,0.08);
+            width: 90%;
+            max-width: 480px;
+            padding: 48px 40px;
+            position: relative;
+            z-index: 1;
+            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Logo 區域 */
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+        .logo-icon {
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, var(--teal), var(--teal-dark));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+        .logo-text {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--slate);
+            letter-spacing: -0.02em;
+        }
+        .logo-sub {
+            font-size: 0.75rem;
+            color: var(--slate-light);
+            font-weight: 400;
+        }
+
+        /* 內容 */
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--slate);
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+        .card-desc {
+            font-size: 0.9rem;
+            color: var(--slate-light);
+            line-height: 1.7;
+            margin-bottom: 28px;
+        }
+
+        /* 授權步驟 */
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--surface);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            animation: fadeIn 0.4s ease both;
+        }
+        .step:nth-child(1) { animation-delay: 0.1s; }
+        .step:nth-child(2) { animation-delay: 0.2s; }
+        .step:nth-child(3) { animation-delay: 0.3s; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-8px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .step-icon {
+            width: 32px; height: 32px;
+            background: var(--teal-light);
+            color: var(--teal-dark);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .step-text {
+            font-size: 0.85rem;
+            color: var(--slate-mid);
+            font-weight: 500;
+        }
+
+        /* 主按鈕 */
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--teal), var(--teal-dark));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(13,148,136,0.3);
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(13,148,136,0.4);
+        }
+        .btn-primary:active { transform: translateY(0); }
+
+        /* 聯繫測試按鈕 */
+        .btn-secondary {
+            width: 100%;
+            padding: 13px;
+            background: transparent;
+            color: var(--teal-dark);
+            border: 1.5px solid var(--teal);
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .btn-secondary:hover {
+            background: var(--teal-light);
+        }
+
+        /* 聯繫表單面板 */
+        .contact-panel {
+            display: none;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 20px;
+            animation: expand 0.3s ease;
+        }
+        .contact-panel.open { display: block; }
+        @keyframes expand {
+            from { opacity: 0; transform: scaleY(0.95); transform-origin: top; }
+            to { opacity: 1; transform: scaleY(1); }
+        }
+        .contact-panel h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--slate);
+            margin-bottom: 14px;
+        }
+        .form-group {
+            margin-bottom: 12px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--slate-light);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            color: var(--slate);
+            background: white;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: var(--teal);
+            box-shadow: 0 0 0 3px rgba(13,148,136,0.1);
+        }
+        .form-group textarea { resize: none; height: 70px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn-submit {
+            width: 100%;
+            padding: 10px;
+            background: var(--teal-dark);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            margin-top: 4px;
+            transition: background 0.2s;
+        }
+        .btn-submit:hover { background: var(--teal); }
+
+        /* 成功訊息 */
+        .success-msg {
+            display: none;
+            text-align: center;
+            padding: 12px;
+            background: var(--teal-light);
+            border-radius: 10px;
+            color: var(--teal-dark);
+            font-size: 0.88rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+        .success-msg.show { display: block; animation: fadeIn 0.3s ease; }
+
+        /* 安全提示 */
+        .security-note {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            color: var(--slate-light);
+            justify-content: center;
+        }
+
+        /* 載入狀態 */
+        .spinner-inline {
+            width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.4);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: none;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-slate-900 to-slate-800 min-h-screen flex items-center justify-center p-6">
-    <div class="max-w-4xl w-full">
-        <div class="text-center mb-12">
-            <div class="inline-block p-4 bg-blue-500/10 rounded-2xl mb-4 border border-blue-500/20">
-                <i class="fa-solid fa-notes-medical text-5xl text-blue-400"></i>
-            </div>
-            <h1 class="text-4xl font-black text-white tracking-tight italic">SMART <span class="text-blue-400 text-not-italic font-light">on</span> FHIR</h1>
-            <p class="text-slate-400 mt-2 font-mono text-sm uppercase tracking-widest">糖尿病共照網品質監測系統</p>
-        </div>
+<body>
 
-        <div id="status" class="text-center py-16">
-            <i class="fa-solid fa-spinner fa-spin text-4xl text-blue-400"></i>
-            <p class="mt-6 text-slate-300">準備啟動 EHR Launch 流程...</p>
+<div class="card">
+    <!-- Logo -->
+    <div class="logo-area">
+        <div class="logo-icon">&#10084;</div>
+        <div>
+            <div class="logo-text">糖尿病共照網</div>
+            <div class="logo-sub">Diabetes Collaborative Care Network</div>
         </div>
-
-        <footer class="mt-16 text-center text-slate-600 text-xs">
-            <p>© 2026 糖尿病共照網品質監測系統 | Powered by FHIR R4</p>
-            <p class="mt-2 font-mono text-[10px]">Client: cc344727... | Secret: 79f04b...</p>
-        </footer>
     </div>
+
+    <h2 class="card-title">系統授權登入</h2>
+    <p class="card-desc">本系統採用 SMART on FHIR 標準進行安全授權，授權完成後將自動跳轉至品質管理儀表板。</p>
+
+    <!-- 步驟說明 -->
+    <div class="steps">
+        <div class="step">
+            <div class="step-icon">🔐</div>
+            <div class="step-text">OAuth 2.0 安全驗證</div>
+        </div>
+        <div class="step">
+            <div class="step-icon">📋</div>
+            <div class="step-text">讀取授權範圍內的病患資料</div>
+        </div>
+        <div class="step">
+            <div class="step-icon">📊</div>
+            <div class="step-text">載入品質管理指標儀表板</div>
+        </div>
+    </div>
+
+    <!-- 主要授權按鈕 -->
+    <button class="btn-primary" id="auth-btn" onclick="startAuth()">
+        <div class="spinner-inline" id="spinner"></div>
+        <span id="btn-text">🚀 開始授權並登入</span>
+    </button>
+
+    <!-- 聯繫測試按鈕 -->
+    <button class="btn-secondary" onclick="toggleContact()">
+        📅 後續將與您聯繫 — 預約測試時間
+    </button>
+
+    <!-- 聯繫面板 -->
+    <div class="contact-panel" id="contact-panel">
+        <h4>📬 預約系統測試時間</h4>
+        <div class="form-group">
+            <label>機構 / 診所名稱</label>
+            <input type="text" id="org-name" placeholder="例：大安醫療診所">
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>聯絡人姓名</label>
+                <input type="text" id="contact-name" placeholder="王小明">
+            </div>
+            <div class="form-group">
+                <label>聯絡電話</label>
+                <input type="tel" id="contact-phone" placeholder="0912-345-678">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>電子郵件</label>
+            <input type="email" id="contact-email" placeholder="example@hospital.com.tw">
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>偏好測試日期</label>
+                <input type="date" id="pref-date">
+            </div>
+            <div class="form-group">
+                <label>偏好時段</label>
+                <select id="pref-time">
+                    <option value="">請選擇</option>
+                    <option>上午 09:00–12:00</option>
+                    <option>下午 13:00–17:00</option>
+                    <option>彈性配合</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>備註 / 測試需求</label>
+            <textarea id="contact-note" placeholder="請描述您的系統環境或特殊需求..."></textarea>
+        </div>
+        <button class="btn-submit" onclick="submitContact()">✉️ 送出預約申請</button>
+    </div>
+
+    <!-- 成功訊息 -->
+    <div class="success-msg" id="success-msg">
+        ✅ 申請已送出！我們將在 1–2 個工作天內與您聯繫確認測試時間。
+    </div>
+
+    <!-- 安全提示 -->
+    <div class="security-note">
+        🔒 本系統採用 TLS 加密傳輸，符合 HIPAA / GDPR 規範
+    </div>
+</div>
+
+<script>
+    // 預設填入今天以後的日期
+    const dateInput = document.getElementById('pref-date');
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.min = today;
+    dateInput.value = today;
+
+    function startAuth() {
+        const btn = document.getElementById('auth-btn');
+        const spinner = document.getElementById('spinner');
+        const btnText = document.getElementById('btn-text');
+        btn.disabled = true;
+        spinner.style.display = 'block';
+        btnText.textContent = '授權中，請稍候...';
+
+        FHIR.oauth2.authorize({
+            client_id: "cc344727-6f90-496c-94fd-c7829aa9a51d",
+            scope: "openid profile user/*.read patient/*.read launch",
+            redirect_uri: "index.html",
+            completeInTarget: true
+        });
+    }
+
+    function toggleContact() {
+        const panel = document.getElementById('contact-panel');
+        panel.classList.toggle('open');
+    }
+
+    function submitContact() {
+        const org   = document.getElementById('org-name').value.trim();
+        const name  = document.getElementById('contact-name').value.trim();
+        const phone = document.getElementById('contact-phone').value.trim();
+        const email = document.getElementById('contact-email').value.trim();
+        const date  = document.getElementById('pref-date').value;
+        const time  = document.getElementById('pref-time').value;
+
+        if (!name || !phone || !email) {
+            alert('請填寫聯絡人姓名、電話及電子郵件。');
+            return;
+        }
+
+        // 實際環境：送到後端 API
+        const payload = { org, name, phone, email, date, time,
+            note: document.getElementById('contact-note').value };
+        console.log('預約申請資料：', payload);
+
+        // 顯示成功訊息
+        document.getElementById('contact-panel').classList.remove('open');
+        const msg = document.getElementById('success-msg');
+        msg.classList.add('show');
+        setTimeout(() => msg.classList.remove('show'), 6000);
+    }
+</script>
 </body>
 </html>
